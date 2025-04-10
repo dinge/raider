@@ -8,7 +8,7 @@ module Raider
             chat_model: "llama3.2-vision:11b",
             temperature: 0.1,
             system: "You are a document analysis expert, your goal is to analyze documents and provide insights.
-                     You will respond only in JSON format.",
+                     You have to respond only in JSON format.",
             format: 'json'
           }
         )

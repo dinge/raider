@@ -8,7 +8,8 @@ module Raider
             chat_model: "gemma3:12b",
             temperature: 0.1,
             num_predict: 512,
-            system: "You are a document analysis expert, your goal is to analyze documents and provide insights.",
+            system: "You are a document analysis expert, your goal is to analyze documents and provide insights.
+                     You have to respond only in JSON format.",
             format: 'json'
           }
         )

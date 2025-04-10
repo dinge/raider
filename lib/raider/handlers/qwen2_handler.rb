@@ -9,7 +9,8 @@ module Raider
             temperature: 0.1,
             num_predict: 512,
             top_p: 0.9,
-            system: "You are a document analysis expert, your goal is to analyze documents and provide insights.",
+            system: "You are a document analysis expert, your goal is to analyze documents and provide insights.
+                     You have to respond only in JSON format.",
             format: 'json'
           }
         )

@@ -13,7 +13,8 @@ module Raider
     private
 
     def process_files
-      pdf_files.shuffle[0, 3].each { |pdf| process_file(pdf) }
+      # pdf_files.shuffle[0, 3].each { |pdf| process_file(pdf) }
+      pdf_files[0, 3].each { |pdf| process_file(pdf) }
     end
 
     def process_file(pdf)

@@ -37,7 +37,7 @@ loader.push_dir(lib_path)
 loader.collapse("lib/raider/handlers/*")
 loader.collapse("lib/raider/prompts/*")
 loader.enable_reloading
-loader.log!
+# loader.log!
 loader.setup
 
 # Eager load base classes

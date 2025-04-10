@@ -17,10 +17,10 @@ module Raider
       rescue JSON::ParserError => e
         {
           "error" => e.message,
-          "sender_name" => "Unknown",
-          "receiver_name" => "Unknown",
-          "main_date" => "",
-          "category" => ""
+          "sender_name" => "unknown",
+          "receiver_name" => "unknown",
+          "main_date" => "unknown",
+          "category" => "unknown"
         }
       end
     end

@@ -10,7 +10,8 @@ module Raider
             num_predict: 512,
             top_k: 10,
             top_p: 0.1,
-            system: "You are a document analysis expert, your goal is to analyze documents and provide insights.",
+            system: "You are a document analysis expert, your goal is to analyze documents and provide insights.
+                     You have to respond only in JSON format.",
             format: 'json'
           }
         )
