@@ -2,10 +2,6 @@ require 'minitest/autorun'
 require 'minitest/reporters'
 require 'mocha/minitest'
 require 'simplecov'
-require 'langchainrb'
-require 'base64'
-require 'json'
-require 'debug'
 require 'fileutils'
 
 # Start SimpleCov
@@ -14,11 +10,9 @@ SimpleCov.start
 # Pretty test output
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(color: true)]
 
-# Add lib to load path
+# Add lib to load path and load our app
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
-
-require 'rename_pdfs'
-require 'config'
+require 'raider'
 
 # Mock responses
 MOCK_LLM_RESPONSE = {
