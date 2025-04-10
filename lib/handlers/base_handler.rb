@@ -1,5 +1,3 @@
-require_relative '../prompts/document_analysis'
-
 module Handlers
   class Base
     def analyze_document(image)
