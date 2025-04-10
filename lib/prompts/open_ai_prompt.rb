@@ -2,22 +2,45 @@ require_relative 'base_prompt'
 
 module Prompts
   class OpenAiPrompt < Base
-    def to_document_infos
-      format_template(TEMPLATE)
-    end
+    def analyze_document
+      <<~TEXT
+      Act as a document analysis expert, analyze this image and extract:
 
-    private
+      1. The sender (from letterhead, company logo, or sender details, or sender address block)
+      2. The recipient (from address block or recipient field)
+      3. The primary document date (the current year is #{Time.now.year})
+      4. The document type in German
 
-    TEMPLATE = <<~TEXT
-      Analyze this document image and return ONLY a JSON object with these fields:
+      Important:
+      - Use YYYY-MM-DD format for dates
+      - For Category use the most fitting german type like (rechnung, mahnung, anschreiben, angebot, prüfung, verschiedenes)
+      - if no category fits extacty, find out what type the document is
+      - Use "unknown" for unclear values
+      - No additional text or explanations.
+      - Focus on accuracy and maintain the exact JSON structure
+
+      Return ONLY a JSON object with this structure:
       {
         "sender_name": "Company or person who sent the document",
         "receiver_name": "Company or person receiving the document",
         "main_date": "Main document date in YYYY-MM-DD format",
-        "category": "Document category in German (e.g. {{categories}})"
+        "category": "Document category in German"
       }
-      Respond only with valid JSON. Do not write an introduction or summary.
-      Do not include any additional information or comments. Do just return the JSON object without markdown other wrappers
-    TEXT
+      TEXT
+    end
+
+    def document_infos_template_xxxx
+      <<~TEXT
+        Analyze this document image and return ONLY a JSON object with these fields:
+        {
+          "sender_name": "Company or person who sent the document",
+          "receiver_name": "Company or person receiving the document",
+          "main_date": "Main document date in YYYY-MM-DD format",
+          "category": "Document category in German (e.g. #{context[:categories]})"
+        }
+        Respond only with valid JSON. Do not write an introduction or summary.
+        Do not include any additional information or comments. Do just return the JSON object without markdown other wrappers
+      TEXT
+    end
   end
 end

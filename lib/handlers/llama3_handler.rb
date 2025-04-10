@@ -9,6 +9,8 @@ module Handlers
         default_options: {
           chat_model: "llama3.2-vision:11b",
           temperature: 0.1,
+          system: "You are a document analysis expert, your goal is to analyze documents and provide insights.",
+          format: 'json'
         }
       )
     end
@@ -17,7 +19,7 @@ module Handlers
       b64 = base64_encode(image)
       messages = [{
         role: "user",
-        content: @prompt.to_document_infos,
+        content: @prompt.analyze_document,
         images: [b64],
         response_format: "json"
       }]

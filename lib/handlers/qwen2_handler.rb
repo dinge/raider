@@ -10,7 +10,9 @@ module Handlers
           chat_model: "siasi/qwen2-vl-7b-instruct:latest",
           temperature: 0.1,
           num_predict: 512,
-          top_p: 0.9
+          top_p: 0.9,
+          system: "You are a document analysis expert, your goal is to analyze documents and provide insights.",
+          format: 'json'
         }
       )
     end
@@ -19,7 +21,7 @@ module Handlers
       b64 = base64_encode(image)
       messages = [{
         role: "user",
-        content: @prompt.to_document_infos,
+        content: @prompt.analyze_document,
         images: [b64],
         response_format: "json"
       }]

@@ -16,13 +16,14 @@ module Handlers
       messages = [{
         role: "user",
         content: [
-          { type: "text", text: @prompt.to_document_infos },
+          { type: "text", text: @prompt.analyze_document },
           { type: "image_url", image_url: { url: "data:image/png;base64,#{b64}" } }
         ]
       }]
 
       response = @llm.chat(messages: messages)
-      JSON.parse(response.raw_response.dig('choices').first.dig('message', 'content'))
+      content = response.raw_response.dig('choices').first.dig('message', 'content')
+      parse_json_safely(content)
     end
   end
 end

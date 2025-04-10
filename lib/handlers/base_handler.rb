@@ -10,22 +10,16 @@ module Handlers
       Base64.strict_encode64(File.binread(image))
     end
 
-    def extract_json_from_text(text)
-      if match = text.match(/\{.*\}/m)
-        match[0]
-      else
-        "{}"
-      end
-    end
-
     def parse_json_safely(str)
-      JSON.parse(str)
-    rescue JSON::ParserError
+      json_match = str.match(/\{.*\}/m)
+      json_match ? JSON.parse(json_match[0]) : { message: str }
+    rescue JSON::ParserError => e
       {
+        "error" => e.message,
         "sender_name" => "Unknown",
         "receiver_name" => "Unknown",
         "main_date" => "",
-        "category" => "misc"
+        "category" => ""
       }
     end
   end
