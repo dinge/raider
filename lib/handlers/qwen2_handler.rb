@@ -10,8 +10,7 @@ module Handlers
           chat_model: "siasi/qwen2-vl-7b-instruct:latest",
           temperature: 0.1,
           num_predict: 512,
-          top_p: 0.9,
-          format: "json"
+          top_p: 0.9
         }
       )
     end
@@ -21,7 +20,8 @@ module Handlers
       messages = [{
         role: "user",
         content: @prompt.to_document_infos,
-        images: [b64]
+        images: [b64],
+        response_format: "json"
       }]
 
       response = @llm.chat(messages: messages)

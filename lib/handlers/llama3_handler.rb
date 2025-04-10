@@ -9,7 +9,6 @@ module Handlers
         default_options: {
           chat_model: "llama3.2-vision:11b",
           temperature: 0.1,
-          response_format: "json"
         }
       )
     end
@@ -20,7 +19,7 @@ module Handlers
         role: "user",
         content: @prompt.to_document_infos,
         images: [b64],
-        format: "json"
+        response_format: "json"
       }]
 
       response = @llm.chat(messages: messages)

@@ -21,7 +21,7 @@ module Handlers
         role: "user",
         content: @prompt.to_document_infos,
         images: [b64],
-        format: "json"
+        response_format: "json"
       }]
 
       response = @llm.chat(messages: messages)

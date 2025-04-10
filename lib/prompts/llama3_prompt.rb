@@ -11,9 +11,9 @@ module Prompts
     TEMPLATE = <<~TEXT
       As a document analysis expert, analyze this image and extract:
 
-      1. The sender (from letterhead, company logo, or sender details)
+      1. The sender (from letterhead, company logo, or sender details, or sender address block)
       2. The recipient (from address block or recipient field)
-      3. The primary document date
+      3. The primary document date (the current year is 2025)
       4. The document type in German (valid types: {{categories}})
 
       Return ONLY a JSON object with this structure:
