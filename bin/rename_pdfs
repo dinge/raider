@@ -8,7 +8,7 @@ begin
 
   require 'raider'
 
-  config = Raider::Config.from_args
+  config = Raider::Config::RenamePdfsConfig.from_args
   Raider::RenamePdfs.new(config).run
 rescue => e
   puts "Error: #{e.class} - #{e.message}"

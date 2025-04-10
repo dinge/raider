@@ -24,11 +24,6 @@ Raider.logger = Logger.new(IO::NULL)
 Raider.logger.level = Logger::FATAL
 Langchain.logger.level = Logger::FATAL
 
-
-puts "Loading Raider..."
-puts "Root path: #{Raider.root}"
-
-# Setup autoloading
 loader = Zeitwerk::Loader.new
 loader.tag = "raider"
 loader.logger = Raider.logger
