@@ -2,10 +2,7 @@ require 'optparse'
 
 module RenamePdfs
   class Config
-    VALID_CATEGORIES = %w[Rechnung Brief Vertrag Mahnung Beleg Angebot misc]
-    
     attr_reader :directory, :force, :debug, :provider, :dpi
-    attr_reader :prompt_context
 
     def self.from_args(args = ARGV)
       new.tap { |config| config.parse_args(args) }
@@ -17,7 +14,6 @@ module RenamePdfs
       @provider = :open_ai
       @dpi = 200
       @directory = "."
-      @prompt_context = default_prompt_context
     end
 
     def parse_args(args)
@@ -38,15 +34,6 @@ module RenamePdfs
       return if Dir.exist?(@directory)
       puts "Directory not found: #{@directory}"
       exit 1
-    end
-
-    def default_prompt_context
-      {
-        categories: VALID_CATEGORIES.join(", "),
-        rules: [],
-        custom_rules: [],
-        additional_instructions: nil
-      }
     end
   end
 end

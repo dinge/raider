@@ -48,7 +48,7 @@ module RenamePdfs
 
     def create_llm_handler
       puts "using #{@config.provider.to_s.camelize}Handler"
-      "Handlers::#{@config.provider.to_s.camelize}Handler".constantize.new(@config.prompt_context)
+      "Handlers::#{@config.provider.to_s.camelize}Handler".constantize.new
     end
 
     def output_debug(analysis)

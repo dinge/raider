@@ -3,8 +3,8 @@ require_relative '../prompts/gemma3_prompt'
 
 module Handlers
   class Gemma3Handler < Base
-    def initialize(context = {})
-      @prompt = Prompts::Gemma3Prompt.new(context)
+    def initialize
+      @prompt = Prompts::Gemma3Prompt.new
       @llm = Langchain::LLM::Ollama.new(
         default_options: {
           chat_model: "gemma3:12b",

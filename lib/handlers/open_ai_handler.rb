@@ -3,8 +3,8 @@ require_relative '../prompts/open_ai_prompt'
 
 module Handlers
   class OpenAiHandler < Base
-    def initialize(context = {})
-      @prompt = Prompts::OpenAiPrompt.new(context)
+    def initialize
+      @prompt = Prompts::OpenAiPrompt.new
       @llm = Langchain::LLM::OpenAI.new(
         api_key: ENV["OPENAI_API_KEY"],
         default_options: { model: 'gpt-4', temperature: 0.1 }

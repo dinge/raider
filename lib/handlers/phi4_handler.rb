@@ -3,8 +3,8 @@ require_relative '../prompts/phi4_prompt'
 
 module Handlers
   class Phi4Handler < Base
-    def initialize(context = {})
-      @prompt = Prompts::Phi4Prompt.new(context)
+    def initialize
+      @prompt = Prompts::Phi4Prompt.new
       @llm = Langchain::LLM::Ollama.new(
         default_options: {
           chat_model: "phi4:latest",

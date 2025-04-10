@@ -3,8 +3,8 @@ require_relative '../prompts/qwen2_prompt'
 
 module Handlers
   class Qwen2Handler < Base
-    def initialize(context = {})
-      @prompt = Prompts::Qwen2Prompt.new(context)
+    def initialize
+      @prompt = Prompts::Qwen2Prompt.new
       @llm = Langchain::LLM::Ollama.new(
         default_options: {
           chat_model: "siasi/qwen2-vl-7b-instruct:latest",

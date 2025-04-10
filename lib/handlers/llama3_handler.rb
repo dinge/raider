@@ -3,8 +3,8 @@ require_relative '../prompts/llama3_prompt'
 
 module Handlers
   class Llama3Handler < Base
-    def initialize(context = {})
-      @prompt = Prompts::Llama3Prompt.new(context)
+    def initialize
+      @prompt = Prompts::Llama3Prompt.new
       @llm = Langchain::LLM::Ollama.new(
         default_options: {
           chat_model: "llama3.2-vision:11b",
@@ -24,7 +24,8 @@ module Handlers
       }]
 
       response = @llm.chat(messages: messages)
-      JSON.parse(response.raw_response.dig('message', 'content'))
-    end
+      content = response.raw_response.dig('message', 'content')
+      parse_json_safely(content)
+   end
   end
 end
