@@ -2,7 +2,7 @@ require 'date'
 require 'fileutils'
 require 'active_support/core_ext/string'
 
-module RenamePdfs
+module Raider
   class PdfProcessor
     def initialize(dpi: 200)
       @dpi = dpi

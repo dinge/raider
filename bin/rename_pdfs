@@ -16,8 +16,8 @@ gemfile(false) do
 end
 
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
-require 'application'
+require 'rename_pdfs'
 require 'config'
 
-config = RenamePdfs::Config.from_args
-RenamePdfs::Application.new(config).run
+config = Raider::Config.from_args
+Raider::RenamePdfs.new(config).run

@@ -6,8 +6,8 @@ require_relative 'handlers/gemma3_handler'
 require_relative 'handlers/phi4_handler'
 require_relative 'handlers/qwen2_handler'
 
-module RenamePdfs
-  class Application
+module Raider
+  class RenamePdfs
     def initialize(config)
       @config = config
       @pdf_processor = PdfProcessor.new(dpi: config.dpi)

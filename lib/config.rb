@@ -1,6 +1,6 @@
 require 'optparse'
 
-module RenamePdfs
+module Raider
   class Config
     attr_reader :directory, :force, :debug, :provider, :dpi
 
