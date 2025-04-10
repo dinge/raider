@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "bundler/inline"
+
+gemfile(false) do
+  gem "langchainrb"
+  gem "ruby-vips"
+  gem "pdf-reader"
+  gem "base64"
+  gem "json"
+  gem "activesupport"
+  gem "debug"
+  gem "faraday"
+  gem "ruby-openai"
+end
+
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
+require 'application'
+require 'config'
+
+config = RenamePdfs::Config.from_args
+RenamePdfs::Application.new(config).run
