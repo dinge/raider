@@ -27,6 +27,6 @@ module Handlers
       response = @llm.chat(messages: messages)
       content = response.raw_response.dig('message', 'content')
       parse_json_safely(content)
-   end
+    end
   end
 end
