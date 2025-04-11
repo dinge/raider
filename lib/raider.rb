@@ -39,7 +39,3 @@ loader.collapse("lib/raider/prompts/*")
 loader.enable_reloading
 # loader.log!
 loader.setup
-
-# Eager load base classes
-require_relative "raider/handlers/base_handler"
-require_relative "raider/prompts/base_prompt"

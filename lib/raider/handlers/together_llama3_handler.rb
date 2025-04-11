@@ -1,13 +1,18 @@
 module Raider
   module Handlers
-    class OpenAiHandler < Base
+    class TogetherLlama3Handler < Base
       def initialize
-        @prompt = Prompts::OpenAiPrompt.new
+        @prompt = Prompts::TogetherLlama3Prompt.new
         @llm = Langchain::LLM::OpenAI.new(
-          api_key: ENV["OPENAI_API_KEY"],
-          # default_options: { model: 'gpt-4', temperature: 0.1 }
-          # default_options: { model: 'o1-mini', temperature: 0.1 }
-          default_options: { model: 'gpt-4o-mini', temperature: 0.1 }
+          api_key: ENV["TOGETHER_API_KEY"],
+          llm_options: {
+            uri_base: "https://api.together.xyz/v1"
+          },
+          default_options: {
+            model: 'meta-llama/Llama-3.2-90B-Vision-Instruct-Turbo',
+            chat_model: 'meta-llama/Llama-3.2-90B-Vision-Instruct-Turbo',
+            temperature: 0.1
+          }
         )
       end
 
@@ -17,7 +22,7 @@ module Raider
           role: "user",
           content: [
             { type: "text", text: @prompt.analyze_document },
-            { type: "image_url", image_url: { url: "data:image/png;base64,#{b64}" } }
+            { type: "image_url", image_url: { url: "data:image/jpeg;base64,#{b64}" } }
           ]
         }]
 
