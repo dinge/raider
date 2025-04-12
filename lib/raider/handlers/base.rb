@@ -1,9 +1,7 @@
 module Raider
   module Handlers
     class Base
-      def analyze_document(image)
-        raise NotImplementedError
-      end
+      attr_reader :llm
 
       protected
 

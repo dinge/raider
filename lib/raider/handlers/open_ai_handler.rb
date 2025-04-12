@@ -11,20 +11,20 @@ module Raider
         )
       end
 
-      def analyze_document(image)
-        b64 = base64_encode(image)
-        messages = [{
-          role: "user",
-          content: [
-            { type: "text", text: @prompt.analyze_document },
-            { type: "image_url", image_url: { url: "data:image/png;base64,#{b64}" } }
-          ]
-        }]
+      # def analyze_document(image)
+      #   b64 = base64_encode(image)
+      #   messages = [{
+      #     role: "user",
+      #     content: [
+      #       { type: "text", text: @prompt.analyze_document },
+      #       { type: "image_url", image_url: { url: "data:image/png;base64,#{b64}" } }
+      #     ]
+      #   }]
 
-        response = @llm.chat(messages: messages)
-        content = response.raw_response.dig('choices').first.dig('message', 'content')
-        parse_json_safely(content)
-      end
+      #   response = @llm.chat(messages: messages)
+      #   content = response.raw_response.dig('choices').first.dig('message', 'content')
+      #   parse_json_safely(content)
+      # end
     end
   end
 end
