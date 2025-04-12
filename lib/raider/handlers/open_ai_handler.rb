@@ -2,8 +2,7 @@ module Raider
   module Handlers
     class OpenAiHandler < Base
       def initialize
-        @prompt = Prompts::OpenAiPrompt.new
-        @llm = Langchain::LLM::OpenAI.new(
+          @llm = Langchain::LLM::OpenAI.new(
           api_key: ENV["OPENAI_API_KEY"],
           # default_options: { model: 'gpt-4', temperature: 0.1 }
           # default_options: { model: 'o1-mini', temperature: 0.1 }

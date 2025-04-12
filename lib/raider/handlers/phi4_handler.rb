@@ -2,8 +2,7 @@ module Raider
   module Handlers
     class Phi4Handler < Base
       def initialize
-        @prompt = Prompts::Phi4Prompt.new
-        @llm = Langchain::LLM::Ollama.new(
+          @llm = Langchain::LLM::Ollama.new(
           default_options: {
             chat_model: "phi4:latest",
             temperature: 0.1,

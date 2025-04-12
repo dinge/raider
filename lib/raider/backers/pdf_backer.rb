@@ -1,10 +1,6 @@
-require 'date'
-require 'fileutils'
-require 'active_support/core_ext/string'
-
 module Raider
-  module Processors
-    class PdfProcessor
+  module Backers
+    class PdfBacker
       def initialize(dpi: 200)
         @dpi = dpi
       end

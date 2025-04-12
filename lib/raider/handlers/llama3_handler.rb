@@ -2,8 +2,7 @@ module Raider
   module Handlers
     class Llama3Handler < Base
       def initialize
-        @prompt = Prompts::Llama3Prompt.new
-        @llm = Langchain::LLM::Ollama.new(
+          @llm = Langchain::LLM::Ollama.new(
           default_options: {
             chat_model: "llama3.2-vision:11b",
             temperature: 0.1,

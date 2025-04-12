@@ -28,14 +28,11 @@ loader = Zeitwerk::Loader.new
 loader.tag = "raider"
 loader.logger = Raider.logger
 loader.inflector.inflect(
-  "pdf_processor" => "PdfProcessor",
   "llm" => "LLM"
 )
 
 lib_path = Raider.root.join("lib")
 loader.push_dir(lib_path)
-loader.collapse("lib/raider/handlers/*")
-loader.collapse("lib/raider/prompts/*")
 loader.enable_reloading
 # loader.log!
 loader.setup

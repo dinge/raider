@@ -2,8 +2,7 @@ module Raider
   module Handlers
     class Qwen2Handler < Base
       def initialize
-        @prompt = Prompts::Qwen2Prompt.new
-        @llm = Langchain::LLM::Ollama.new(
+          @llm = Langchain::LLM::Ollama.new(
           default_options: {
             chat_model: "siasi/qwen2-vl-7b-instruct:latest",
             temperature: 0.1,

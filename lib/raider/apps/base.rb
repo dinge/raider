@@ -1,5 +1,5 @@
 module Raider
-  module Tools
+  module Apps
     class Base
       def initialize(config)
         @config = config

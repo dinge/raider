@@ -1,9 +1,11 @@
 module Raider
   module Tasks
     class Base
+      attr_accessor :context
 
       def initialize(handler:)
         @llm = handler.llm
+        #@context = context
       end
 
       private

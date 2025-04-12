@@ -2,8 +2,7 @@ module Raider
   module Handlers
     class TogetherLlama3Handler < Base
       def initialize
-        @prompt = Prompts::TogetherLlama3Prompt.new
-        @llm = Langchain::LLM::OpenAI.new(
+          @llm = Langchain::LLM::OpenAI.new(
           api_key: ENV["TOGETHER_API_KEY"],
           llm_options: {
             uri_base: "https://api.together.xyz/v1"

@@ -1,10 +1,10 @@
 module Raider
-  module Prompts
-    class Base
-      attr_reader :context
+  module Tasks
+    class FetchBasicLetterInfo < Base
 
-      def initialize(context = {}) = @context = context
-      def analyze_document = analyze_document_en
+      def process(image)
+        chat_message_with_image(analyze_document_de, image)
+      end
 
       def analyze_document_en
         <<~TEXT

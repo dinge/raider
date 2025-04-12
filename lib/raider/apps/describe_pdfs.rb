@@ -1,9 +1,9 @@
 module Raider
-  module Tools
+  module Apps
     class DescribePdfs < Base
       def initialize(config)
         super
-        @pdf_processor = Processors::PdfProcessor.new(dpi: config.dpi)
+        @pdf_processor = Backers::PdfBacker.new(dpi: config.dpi)
         @config = config
       end
 

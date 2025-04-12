@@ -1,10 +1,9 @@
 module Raider
-  module Tools
+  module Apps
     class RenamePdfs < Base
       def initialize(config)
         super
-        @pdf_processor = Processors::PdfProcessor.new(dpi: config.dpi)
-        @llm_handler = create_llm_handler
+        @pdf_backer = Backers::PdfBacker.new(dpi: config.dpi)
         @config = config
       end
 
@@ -14,17 +13,14 @@ module Raider
 
       private
 
-      def process_files
-        pdf_files.each { |pdf| process_file(pdf) }
-      end
+      def process_files = pdf_files.each { |pdf| process_file(pdf) }
 
       def process_file(pdf)
         puts pdf
-        img = @pdf_processor.to_image(pdf)
+        img = @pdf_backer.to_image(pdf)
         return unless img && File.exist?(img)
 
-        # analysis = @llm_handler.analyze_document(img)
-        analysis = create_task(:describe_image, handler: @config.provider).process(img)
+        analysis = create_task(:fetch_basic_letter_info, handler: @config.provider).process(img)
 
         log_response(pdf, analysis)
         output_debug(analysis) if @config.debug
@@ -32,11 +28,6 @@ module Raider
         new_name = generate_filename(analysis)
         rename(pdf, new_name, force: @config.force)
         cleanup(img)
-      end
-
-      def create_llm_handler
-        puts "using #{@config.provider.to_s.camelize}Handler"
-        "Raider::Handlers::#{@config.provider.to_s.camelize}Handler".constantize.new
       end
 
       def generate_filename(analysis)
