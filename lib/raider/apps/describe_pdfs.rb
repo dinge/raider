@@ -3,11 +3,11 @@ module Raider
     class DescribePdfs < Base
       def initialize(config)
         super
-        @pdf_processor = Backers::PdfBacker.new(dpi: config.dpi)
+        @pdf_processor = Backers::PdfBacker.new(dpi: config[:dpi])
         @config = config
       end
 
-      def run
+      def process
         process_files
       end
 
@@ -22,10 +22,10 @@ module Raider
         img = @pdf_processor.to_image(pdf)
         return unless img && File.exist?(img)
 
-        analysis = create_task(:describe_image, handler: @config.provider).process(img)
+        analysis = create_task(:describe_image, handler: @config[:provider]).process(img)
 
         log_response(pdf, analysis)
-        output_debug(analysis) if @config.debug
+        output_debug(analysis) if @config[:debug]
 
         # cleanup(img)
       end

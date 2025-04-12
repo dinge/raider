@@ -3,13 +3,23 @@
 
 begin
   require "bundler/setup"
+  require 'slop'
   lib_path = File.expand_path('../lib', __dir__)
   $LOAD_PATH.unshift(lib_path) unless $LOAD_PATH.include?(lib_path)
 
   require 'raider'
 
-  config = Raider::Config::DescribePdfsConfig.from_args
-  Raider::Apps::DescribePdfs.new(config).run
+  options = Slop.parse do |o|
+    o.banner = "Usage: ruby describe_pdf.rb [PDF_FILE] [options]"
+    o.bool '--debug', 'Show/hide analysis details', default: true
+    o.string '-p', '--provider', 'LLM provider (llama3/gemma3/phi4/qwen2/open_ai)', default: 'open_ai'
+    o.integer '-d', '--dpi', 'DPI for PDF conversion', default: 200
+  end
+
+  directory = options.arguments.first || raise("Please provide a PDF file path")
+  raise "File not found: #{directory}" unless File.exist?(directory)
+
+  Raider::Apps::DescribePdfs.new(options.to_h.merge(directory:)).process
 rescue => e
   puts "Error: #{e.class} - #{e.message}"
   puts e.backtrace

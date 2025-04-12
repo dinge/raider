@@ -144,6 +144,7 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.13.1)
     simplecov_json_formatter (0.1.4)
+    slop (4.10.1)
     stringio (3.1.6)
     ttfunk (1.8.0)
       bigdecimal (~> 3.1)
@@ -169,13 +170,13 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
-  activesupport (~> 7.1)
+  activesupport
   base64
   debug
   faraday
   json
   langchainrb
-  minitest (~> 5.20)
+  minitest
   minitest-reporters
   mocha
   pdf-reader
@@ -184,6 +185,7 @@ DEPENDENCIES
   ruby-openai
   ruby-vips
   simplecov
+  slop
   zeitwerk
 
 BUNDLED WITH

@@ -6,7 +6,7 @@ module Raider
       end
 
       def pdf_files
-        Dir.glob(File.join(@config.directory, "*.pdf"))
+        Dir.glob(File.join(@config[:directory], "*.pdf"))
       end
 
       # def create_llm_handler
@@ -28,7 +28,7 @@ module Raider
 
       def log_response(file_path, response)
         FileUtils.mkdir_p('logs')
-        handler_name = @config.provider.to_s
+        handler_name = @config[:provider].to_s
         log_file = "logs/describe_image-#{handler_name}.log"
 
         entry = {
