@@ -10,6 +10,7 @@ module Raider
 
       def self.llm_ident = name.split('::').last.underscore
       delegate :llm_ident, to: :class
+
       def self.available = (Raider::Llms.constants - [:Base]).map { Raider::Llms.const_get(it).llm_ident }
 
       def llm_options

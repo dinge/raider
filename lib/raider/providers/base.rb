@@ -5,6 +5,7 @@ module Raider
     class Base
       def self.provider_ident = name.split('::').last.underscore
       delegate :provider_ident, to: :class
+
       def self.available = (Raider::Providers.constants - [:Base]).map do
         Raider::Providers.const_get(it).provider_ident
       end
