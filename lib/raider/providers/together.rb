@@ -7,8 +7,26 @@ module Raider
         llama3v2_vision_large: {
           model: 'meta-llama/Llama-3.2-90B-Vision-Instruct-Turbo',
           chat_model: 'meta-llama/Llama-3.2-90B-Vision-Instruct-Turbo'
+        },
+        llama3v2_vision_small: {
+          model: 'meta-llama/Llama-3.2-11B-Vision-Instruct-Turbo',
+          chat_model: 'meta-llama/Llama-3.2-11B-Vision-Instruct-Turbo'
+        },
+        llama3v2_vision_free: {
+          model: 'meta-llama/Llama-Vision-Free"',
+          chat_model: 'meta-llama/Llama-Vision-Free"'
+        },
+        qwen2v5_vl_large: {
+          model: 'Qwen/Qwen2-VL-72B-Instruct',
+          chat_model: 'Qwen/Qwen2-VL-72B-Instruct'
+        },
+        qwen2_vl_large: {
+          model: 'Qwen/Qwen2.5-VL-72B-Instruct',
+          chat_model: 'Qwen/Qwen2.5-VL-72B-Instruct'
         }
       }.freeze
+
+      llm_message
 
       def client_class
         Langchain::LLM::OpenAI
