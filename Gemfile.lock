@@ -106,6 +106,7 @@ GEM
       stringio
     public_suffix (6.0.1)
     racc (1.8.1)
+    rack (3.1.13)
     rainbow (3.1.1)
     rake (13.2.1)
     rdoc (6.13.1)
@@ -127,6 +128,12 @@ GEM
     rubocop-ast (1.44.0)
       parser (>= 3.3.7.2)
       prism (~> 1.4)
+    rubocop-rails (2.31.0)
+      activesupport (>= 4.2.0)
+      lint_roller (~> 1.1)
+      rack (>= 1.1)
+      rubocop (>= 1.75.0, < 2.0)
+      rubocop-ast (>= 1.38.0, < 2.0)
     ruby-openai (8.1.0)
       event_stream_parser (>= 0.3.0, < 2.0.0)
       faraday (>= 1)
@@ -182,6 +189,7 @@ DEPENDENCIES
   pdf-reader
   rake
   rubocop
+  rubocop-rails
   ruby-openai
   ruby-vips
   simplecov

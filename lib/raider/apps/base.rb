@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Raider
   module Apps
     class Base
@@ -10,7 +12,7 @@ module Raider
       def app_ident = self.class.name.split('::').last.underscore
 
       def pdf_files
-        Dir.glob(File.join(@config[:directory], "*.pdf"))
+        Dir.glob(File.join(@config[:directory], '*.pdf'))
       end
 
       def create_task(task, llm: nil, provider: nil)

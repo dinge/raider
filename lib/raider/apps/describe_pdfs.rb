@@ -25,7 +25,7 @@ module Raider
       end
 
       def cleanup(path)
-        File.delete(path) if File.exist?(path)
+        FileUtils.rm_f(path)
       end
     end
   end

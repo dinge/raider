@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Raider
   module Runners
     class TaskRunner
@@ -7,7 +9,7 @@ module Raider
         @app = app
         @llm = llm
         @provider = provider
-        #@context = context
+        # @context = context
       end
 
       def process(task)
@@ -25,8 +27,8 @@ module Raider
 
       def build_current_client_options
         @provider.provider_options
-          .deep_merge(@provider.llm_options_by_ident(@llm))
-          .deep_merge(@llm.llm_options)
+                 .deep_merge(@provider.llm_options_by_ident(@llm))
+                 .deep_merge(@llm.llm_options)
       end
 
       def chat_message(prompt)

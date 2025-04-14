@@ -1,22 +1,23 @@
+# frozen_string_literal: true
+
 module Raider
   module Providers
     class Together < Base
-
       MODELS = {
         llama3v2_vision_large: {
           model: 'meta-llama/Llama-3.2-90B-Vision-Instruct-Turbo',
-          chat_model: 'meta-llama/Llama-3.2-90B-Vision-Instruct-Turbo',
+          chat_model: 'meta-llama/Llama-3.2-90B-Vision-Instruct-Turbo'
         }
-      }
+      }.freeze
 
       def client_class
         Langchain::LLM::OpenAI
       end
 
       def provider_options
-        { api_key: ENV["TOGETHER_API_KEY"],
+        { api_key: ENV.fetch('TOGETHER_API_KEY', nil),
           llm_options: {
-            uri_base: "https://api.together.xyz/v1"
+            uri_base: 'https://api.together.xyz/v1'
           },
           default_options: }
       end
@@ -31,25 +32,25 @@ module Raider
 
       def to_messages_basic_with_images_to_json(prompt:)
         [{
-          role: "user",
+          role: 'user',
           content: [
-            { type: "text", text: prompt },
+            { type: 'text', text: prompt }
           ]
         }]
       end
 
       def to_messages_basic_with_images_to_json(prompt:, images:)
         [{
-          role: "user",
+          role: 'user',
           content: [
-            { type: "text", text: prompt },
-            { type: "image_url", image_url: { url: "data:image/png;base64,#{images.first}" } }
+            { type: 'text', text: prompt },
+            { type: 'image_url', image_url: { url: "data:image/png;base64,#{images.first}" } }
           ]
         }]
       end
 
       def parse_raw_response(raw_response)
-        raw_response.dig('choices')&.first&.dig('message', 'content')
+        raw_response['choices']&.first&.dig('message', 'content')
       end
     end
   end

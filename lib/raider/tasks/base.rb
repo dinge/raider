@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Raider
   module Tasks
     class Base
@@ -9,7 +11,7 @@ module Raider
         @app = app
         @llm = llm
         @provider = provider
-        #@context = context
+        # @context = context
       end
 
       def process(prompt)
@@ -19,29 +21,29 @@ module Raider
       def chat(prompt) = @task_runner.chat_message(prompt)
 
       def chat_message_with_images(prompt, images)
-        images = images.map { base64_encode(_1) }
+        images = images.map { base64_encode(it) }
         @task_runner.chat_message_with_images(prompt:, images:)
       end
 
       def prompt
         <<~TEXT
-        describe all what you see, think deeply
-        #{json_instruct}
+          describe all what you see, think deeply
+          #{json_instruct}
         TEXT
       end
 
       def json_instruct
         <<~TEXT
-        Return ONLY a JSON object with this structure:
-        #{example_response_struct}
+          Return ONLY a JSON object with this structure:
+          #{example_response_struct}
         TEXT
       end
 
       def example_response_struct
         {
           description: 'your description after deep analysis',
-          main_date: "Main document date in YYYY-MM-DD format",
-          category: "Document category"
+          main_date: 'Main document date in YYYY-MM-DD format',
+          category: 'Document category'
         }
       end
 

@@ -19,6 +19,7 @@ group :development, :test do
   gem 'mocha'
   gem 'rake'
   gem 'rubocop'
+  gem 'rubocop-rails'
   gem 'simplecov'
   gem 'zeitwerk'
 end

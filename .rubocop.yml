@@ -1,0 +1,84 @@
+require:
+  - rubocop-rails
+  # - rubocop-capybara
+  # - rubocop-haml
+# inherit_from: .rubocop_todo.yml
+inherit_mode:
+  merge:
+    - Exclude
+
+AllCops:
+  TargetRubyVersion: 3.4
+  NewCops: enable
+  Exclude:
+
+Rails/OutputSafety:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/MultilineBlockChain:
+  Enabled: false
+
+Naming/VariableNumber:
+  Enabled: false
+
+Rails/I18nLocaleTexts:
+  Enabled: false
+
+Rails/BulkChangeTable:
+  Enabled: false
+
+Style/MultilineIfModifier:
+  Enabled: false
+
+Style/SafeNavigationChainLength:
+  Enabled: false
+
+Metrics/BlockLength:
+  Exclude:
+    - "config/environments/*"
+
+Layout/LineLength:
+  Max: 120
+
+Naming/MethodParameterName:
+  MinNameLength: 2
+
+Metrics/CyclomaticComplexity:
+  Max: 12
+
+Metrics/PerceivedComplexity:
+  Max: 12
+
+Metrics/MethodLength:
+  Exclude:
+    - "db/migrate/*"
+    - "app/services/page_plan/*"
+
+Metrics/AbcSize:
+  Max: 20
+  Exclude:
+    - "db/migrate/*"
+    - "app/services/page_plan/*"
+
+Metrics/ModuleLength:
+  Exclude:
+    - "app/controllers/concerns/record_manager.rb"
+
+Style/LambdaCall:
+  Enabled: false
+
+Style/StabbyLambdaParentheses:
+  Enabled: false
+
+Rails/RedundantPresenceValidationOnBelongsTo:
+  Enabled: false
+
+Rails/Output:
+  Enabled: false
+
+Rails/SkipsModelValidations:
+  Exclude:
+    - "app/views/**/*"

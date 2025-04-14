@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Raider
   module Runners
     class AgentRunner
@@ -7,7 +9,7 @@ module Raider
         @app = app
         @llm = llm
         @provider = provider
-        #@context = context
+        # @context = context
       end
 
       def process(task)
