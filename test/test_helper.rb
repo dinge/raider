@@ -24,9 +24,29 @@ MOCK_LLM_RESPONSE = {
 module TestHelpers
   # Helper to stub LLM responses
   def stub_llm_analysis
-    # Mock the LLM handler creation
+    # Mock the handler and task
     mock_handler = mock('llm_handler')
-    mock_handler.stubs(:analyze_document).returns(MOCK_LLM_RESPONSE)
-    Raider::RenamePdfs.any_instance.stubs(:create_llm_handler).returns(mock_handler)
+    mock_task = mock('task')
+    
+    # Setup the task mock
+    mock_task.stubs(:process).returns(MOCK_LLM_RESPONSE)
+    
+    # Setup handler class mock
+    mock_handler_class = mock('handler_class')
+    mock_handler_class.stubs(:new).returns(mock_handler)
+    
+    # Stub the constantize call that creates the handler
+    String.any_instance.stubs(:constantize).returns(mock_handler_class)
+    
+    # Stub task creation
+    Raider::Tasks.stubs(:const_get).returns(Class.new do
+      def initialize(handler:)
+        @handler = handler
+      end
+      
+      def process(*)
+        MOCK_LLM_RESPONSE
+      end
+    end)
   end
 end

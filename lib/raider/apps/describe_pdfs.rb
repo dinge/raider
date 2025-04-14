@@ -1,13 +1,8 @@
 module Raider
   module Apps
     class DescribePdfs < Base
-      def initialize(config)
-        super
-        @pdf_processor = Backers::PdfBacker.new(dpi: config[:dpi])
-        @config = config
-      end
-
       def process
+        @pdf_util = Poros::PdfUtil.new(dpi: config[:dpi])
         process_files
       end
 
@@ -19,14 +14,11 @@ module Raider
 
       def process_file(pdf)
         puts pdf
-        img = @pdf_processor.to_image(pdf)
+        img = @pdf_util.to_image(pdf)
         return unless img && File.exist?(img)
 
-        analysis = create_task(:describe_image, handler: @config[:provider]).process(img)
-
-        log_response(pdf, analysis)
-        output_debug(analysis) if @config[:debug]
-
+        response = create_task(:describe_image).process(img)
+        dump(response)
         # cleanup(img)
       end
 

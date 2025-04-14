@@ -3,10 +3,10 @@ module Raider
     class FetchBasicLetterInfo < Base
 
       def process(image)
-        chat_message_with_image(analyze_document_de, image)
+        chat_message_with_images(prompt_en, [image])
       end
 
-      def analyze_document_en
+      def prompt_en
         <<~TEXT
         Act as a professional experienced document analysis expert.
         You can read and understand German text.
@@ -26,17 +26,20 @@ module Raider
         - No additional text or explanations
         - Focus on accuracy and maintain the exact JSON structure
 
-        Return ONLY a JSON object with this structure:
+        #{json_instruct}
+        TEXT
+      end
+
+      def example_response_struct
         {
           "sender_name": "Company or person who sent the document",
           "receiver_name": "Company or person receiving the document",
           "main_date": "Main document date in YYYY-MM-DD format",
           "category": "Document category in German"
         }
-        TEXT
       end
 
-      def analyze_document_de
+      def prompt_de
         <<~TEXT
         Du bist ein Experte für Dokumentenanalyse. Analysiere das angehängte Bild.
         Es handelt sich um ein gescanntes oder fotografiertes deutschsprachiges Geschäftsdokument.

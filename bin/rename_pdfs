@@ -3,13 +3,31 @@
 
 begin
   require "bundler/setup"
+  require 'slop'
   lib_path = File.expand_path('../lib', __dir__)
   $LOAD_PATH.unshift(lib_path) unless $LOAD_PATH.include?(lib_path)
 
   require 'raider'
 
-  config = Raider::Config::RenamePdfsConfig.from_args
-  Raider::Apps::RenamePdfs.new(config).run
+  options = Slop.parse do |o|
+    o.banner = "Usage: ruby rename_pdfs.rb [DIRECTORY] [options]"
+    o.bool '-h', '--help', 'Show help', default: false
+    o.bool '-d', '--debug', 'Show/hide analysis details', default: false
+    o.string '-p', '--provider', "LLM provider (#{Raider::Providers::Base.available.join('/')})", default: 'open_ai'
+    o.string '-l', '--llm', "LLM (#{Raider::Llms::Base.available.join('/')})"
+    o.integer '--dpi', 'DPI for PDF conversion', default: 200
+    o.bool '-f', '--force', 'Actually rename files', default: false
+  end
+
+  if options[:help]
+    puts options
+    exit 1
+  end
+
+  directory = options.arguments.first || "."
+  raise "Directory not found: #{directory}" unless Dir.exist?(directory)
+
+  Raider::Apps::RenamePdfs.new(options.to_h.merge(directory:)).process
 rescue => e
   puts "Error: #{e.class} - #{e.message}"
   puts e.backtrace

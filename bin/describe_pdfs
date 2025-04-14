@@ -11,9 +11,16 @@ begin
 
   options = Slop.parse do |o|
     o.banner = "Usage: ruby describe_pdf.rb [PDF_FILE] [options]"
-    o.bool '--debug', 'Show/hide analysis details', default: true
-    o.string '-p', '--provider', 'LLM provider (llama3/gemma3/phi4/qwen2/open_ai)', default: 'open_ai'
-    o.integer '-d', '--dpi', 'DPI for PDF conversion', default: 200
+    o.bool '-h', '--help', 'Show help', default: false
+    o.bool '-d', '--debug', 'Show/hide analysis details', default: false
+    o.string '-p', '--provider', "LLM provider (#{Raider::Providers::Base.available.join('/')})", default: 'open_ai'
+    o.string '-l', '--llm', "LLM (#{Raider::Llms::Base.available.join('/')})"
+    o.integer '--dpi', 'DPI for PDF conversion', default: 200
+  end
+
+  if options[:help]
+    puts options
+    exit 1
   end
 
   directory = options.arguments.first || raise("Please provide a PDF file path")

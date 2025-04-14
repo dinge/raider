@@ -2,54 +2,52 @@ module Raider
   module Tasks
     class Base
       attr_accessor :context
+      attr_reader :task_runner
 
-      def initialize(handler:)
-        @llm = handler.llm
+      def initialize(task_runner:, app:, llm:, provider:)
+        @task_runner = task_runner
+        @app = app
+        @llm = llm
+        @provider = provider
         #@context = context
+      end
+
+      def process(prompt)
+        raise NotImplementedError
+      end
+
+      def chat(prompt) = @task_runner.chat_message(prompt)
+
+      def chat_message_with_images(prompt, images)
+        images = images.map { base64_encode(_1) }
+        @task_runner.chat_message_with_images(prompt:, images:)
+      end
+
+      def prompt
+        <<~TEXT
+        describe all what you see, think deeply
+        #{json_instruct}
+        TEXT
+      end
+
+      def json_instruct
+        <<~TEXT
+        Return ONLY a JSON object with this structure:
+        #{example_response_struct}
+        TEXT
+      end
+
+      def example_response_struct
+        {
+          description: 'your description after deep analysis',
+          main_date: "Main document date in YYYY-MM-DD format",
+          category: "Document category"
+        }
       end
 
       private
 
-      def chat_message_with_image(prompt, image)
-        b64 = base64_encode(image)
-
-        # messages = [{
-        #   role: "user",
-        #   content: [
-        #     { type: "text", text: prompt },
-        #     { type: "image_url", image_url: { url: "data:image/png;base64,#{b64}" } }
-        #   ]
-        # }]
-
-        messages = [{
-          role: "user",
-          content: prompt,
-          images: [b64],
-          response_format: "json"
-        }]
-
-
-
-        parse_response(@llm.chat(messages: messages))
-      end
-
-
-      def parse_response(response)
-        response_message = response.raw_response.dig('choices')&.first&.dig('message', 'content') || response.raw_response.dig('message', 'content')
-        parse_json_safely(response_message)
-      end
-
       def base64_encode(image) = Base64.strict_encode64(File.binread(image))
-
-      def parse_json_safely(str)
-        json_match = str.match(/\{.*\}/m)
-        json_match ? JSON.parse(json_match[0]) : { llm_message: str }
-      rescue JSON::ParserError => e
-        {
-          "error" => e.message,
-          "llm_message" => str
-        }
-      end
     end
   end
 end

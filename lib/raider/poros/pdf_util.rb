@@ -1,6 +1,6 @@
 module Raider
-  module Backers
-    class PdfBacker
+  module Poros
+    class PdfUtil
       def initialize(dpi: 200)
         @dpi = dpi
       end

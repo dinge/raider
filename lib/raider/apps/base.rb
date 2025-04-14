@@ -1,46 +1,46 @@
 module Raider
   module Apps
     class Base
+      attr_accessor :config, :llm, :provider
+
       def initialize(config)
         @config = config
       end
+
+      def app_ident = self.class.name.split('::').last.underscore
 
       def pdf_files
         Dir.glob(File.join(@config[:directory], "*.pdf"))
       end
 
-      # def create_llm_handler
-      #   puts "using #{@config.provider.to_s.camelize}Handler"
-      #   "Raider::Handlers::#{@config.provider.to_s.camelize}Handler".constantize.new
+      def create_task(task, llm: nil, provider: nil)
+        @provider = "Raider::Providers::#{provider || @config[:provider].classify}".constantize.new
+        llm_class_name = (llm || @config[:llm] || @provider.default_llm_ident).to_s.classify
+        @llm = "Raider::Llms::#{llm_class_name}".constantize.new(app: self, provider: @provider)
+        Runners::TaskRunner.new(app: self, llm: @llm, provider: @provider).process(task)
+      end
+
+      def create_agent(agent, llm: nil, provider: nil)
+        @provider = "Raider::Providers::#{provider || @config[:provider].classify}".constantize.new
+        llm_class_name = (llm || @config[:llm] || @provider.default_llm_ident).to_s.classify
+        @llm = "Raider::Llms::#{llm_class_name}".constantize.new(app: self, provider: @provider)
+        Runners::AgentRunner.new(app: self, llm: @llm, provider: @provider).process(agent)
+      end
+
+      # def create_task(task, llm: nil, provider: nil)
+      #   run_with_setup(llm:, provider:) do
+      #     Runners::TaskRunner.new(app: self, llm: @llm, provider: @provider).process(task)
+      #   end
       # end
 
-      def create_task(task, handler:)
-        handler_instance = "Raider::Handlers::#{handler.to_s.camelize}Handler".constantize.new
-        Raider::Tasks.const_get(task.to_s.classify).new(handler: handler_instance)
-      end
+      # def run_with_setup(llm:, provider:)
+      #   p = "Raider::Providers::#{provider || @config[:provider].classify}".constantize.new
+      #   llm_class_name = (llm || @config[:llm] || p.default_llm_ident).to_s.classify
+      #   l= "Raider::Llms::#{llm_class_name}".constantize.new(app: self, provider: p)
+      #   Runners::TaskRunner.new(app: self, llm: @llm, provider: @provider).process(task)
+      # end
 
-      protected
-
-      def output_debug(analysis)
-        puts "\nDocument Analysis:"
-        puts JSON.pretty_generate(analysis)
-      end
-
-      def log_response(file_path, response)
-        FileUtils.mkdir_p('logs')
-        handler_name = @config[:provider].to_s
-        log_file = "logs/describe_image-#{handler_name}.log"
-
-        entry = {
-          timestamp: Time.now.iso8601,
-          file_path:,
-          response: response
-        }
-
-        File.open(log_file, 'a') do |f|
-          f.puts [entry].to_yaml
-        end
-      end
+      def dump(entry) = puts JSON.pretty_generate(entry)
     end
   end
 end
