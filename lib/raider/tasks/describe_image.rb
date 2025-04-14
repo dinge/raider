@@ -7,8 +7,8 @@ module Raider
 
       def prompt
         <<~TEXT
-        describe all what you see, think deeply
-        #{json_instruct}
+          describe all what you see, think deeply
+          #{json_instruct}
         TEXT
       end
     end

@@ -1,22 +1,22 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-gem "langchainrb"
-gem "ruby-vips"
-gem "pdf-reader"
-gem "base64"
-gem "json"
-gem "activesupport"
-gem "debug"
-gem "faraday"
-gem "ruby-openai"
-gem "slop"
+gem 'activesupport'
+gem 'base64'
+gem 'debug'
+gem 'faraday'
+gem 'json'
+gem 'langchainrb'
+gem 'pdf-reader'
+gem 'ruby-openai'
+gem 'ruby-vips'
+gem 'slop'
 
 group :development, :test do
-  gem "minitest"
-  gem "minitest-reporters"
-  gem "mocha"
-  gem "simplecov"
-  gem "rubocop"
-  gem "rake"
-  gem "zeitwerk"
+  gem 'minitest'
+  gem 'minitest-reporters'
+  gem 'mocha'
+  gem 'rake'
+  gem 'rubocop'
+  gem 'simplecov'
+  gem 'zeitwerk'
 end
