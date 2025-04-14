@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Raider
   module Apps
     class RenamePdfs < Base
