@@ -3,6 +3,12 @@
 module Raider
   module Providers
     class Base
+      attr_accessor :system_prompt
+
+      def initialize
+        @system_prompt = nil
+      end
+
       def self.provider_ident = name.split('::').last.underscore
       delegate :provider_ident, to: :class
 
@@ -25,6 +31,19 @@ module Raider
       def default_options
         {
           system: 'You are a helpful agent.'
+        }
+      end
+
+      def to_message_with
+        yield.tap do |messages|
+          messages.unshift(system_prompt_template) if system_prompt
+        end
+      end
+
+      def system_prompt_template
+        {
+          role: 'system',
+          content: system_prompt
         }
       end
     end

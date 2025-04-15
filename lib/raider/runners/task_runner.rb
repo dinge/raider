@@ -3,17 +3,23 @@
 module Raider
   module Runners
     class TaskRunner
-      attr_reader :response, :response_message, :app, :llm, :provider
+      attr_reader :response, :response_message, :app, :llm, :provider, :system_prompt
 
       def initialize(app:, llm:, provider:)
         @app = app
         @llm = llm
         @provider = provider
         # @context = context
+
+        @system_prompt = 'You are a helpful agent.'
       end
 
       def process(task)
-        Raider::Tasks.const_get(task.to_s.classify).new(task_runner: self, app:, llm:, provider:)
+        task_instance = Raider::Tasks.const_get(task.to_s.classify).const_get(@llm.llm_ident.to_s.classify)
+
+        # Raider::Tasks.const_get(task.to_s.classify)
+
+        task_instance.new(task_runner: self, app:, llm:, provider:)
       end
 
       def llm_chat(**args)
@@ -31,12 +37,19 @@ module Raider
                  .deep_merge(@llm.llm_options)
       end
 
-      def chat_message(prompt)
+      def set_system_prompt(system_prompt)
+        @system_prompt = system_prompt
+      end
+
+      def chat(prompt, system_prompt: nil)
+        @provider.system_prompt = system_prompt || @system_prompt
         messages = @provider.to_message_basic_to_json(prompt:)
         parse_response(llm_chat(messages: messages))
       end
 
-      def chat_message_with_images(prompt:, images:)
+      def chat_message_with_images(prompt, images, system_prompt: nil)
+        images = images.map { base64_encode(it) }
+        @provider.system_prompt = system_prompt || @system_prompt
         messages = @provider.to_messages_basic_with_images_to_json(prompt:, images:)
         parse_response(llm_chat(messages: messages))
       end
@@ -74,6 +87,8 @@ module Raider
           f.puts [entry].to_yaml
         end
       end
+
+      def base64_encode(image) = Base64.strict_encode64(File.binread(image))
     end
   end
 end

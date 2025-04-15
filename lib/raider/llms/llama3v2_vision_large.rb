@@ -10,7 +10,6 @@ module Raider
           top_k: 50,              # Moderate diversity for robust analysis
           max_tokens: 4096,       # Higher token count for detailed analysis
           repeat_penalty: 1.15,    # Moderate repetition prevention
-          system_message: document_analysis_system_message,
           vision_config: {
             temperature: 0.1,      # Low temperature for vision accuracy
             image_resolution: 'high', # High resolution for document details
@@ -22,26 +21,6 @@ module Raider
             overlap: 128           # Context overlap for coherence
           }
         }
-      end
-
-      private
-
-      def document_analysis_system_message
-        <<~SYSTEM
-          You are an advanced document analysis system with expertise in:
-          - Complex document layout understanding
-          - Multi-modal business document processing
-          - Detailed information extraction
-          - Cross-language document handling
-
-          Your primary functions:
-          1. Analyze document structure and content
-          2. Extract key business information
-          3. Process multiple languages accurately
-          4. Maintain consistent output format
-
-          Always provide responses in valid JSON format.
-        SYSTEM
       end
     end
   end

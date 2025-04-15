@@ -29,25 +29,29 @@ module Raider
       def default_options
         {
           chat_model: default_model,
-          system: 'You are a document analysis expert that always responds in valid JSON format.'
+          system: system_prompt
         }
       end
 
       def to_messages_basic_with_images_to_json(prompt:)
-        [{
-          role: 'user',
-          content: prompt,
-          response_format: 'json'
-        }]
+        to_message_with do
+          [{
+            role: 'user',
+            content: prompt,
+            response_format: 'json'
+          }]
+        end
       end
 
       def to_messages_basic_with_images_to_json(prompt:, images:)
-        [{
-          role: 'user',
-          content: prompt,
-          images: images,
-          response_format: 'json'
-        }]
+        to_message_with do
+          [{
+            role: 'user',
+            content: prompt,
+            images: images,
+            response_format: 'json'
+          }]
+        end
       end
 
       def parse_raw_response(raw_response)

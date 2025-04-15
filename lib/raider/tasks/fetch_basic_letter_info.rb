@@ -16,7 +16,7 @@ module Raider
 
           1. The sender (from letterhead, company logo, or sender details, or sender address block)
           2. The recipient (from address block or recipient field)
-          3. The primary document date (the current year is #{Time.zone.now.year})
+          3. The primary document date (the current year is #{Time.now.year})
           4. The document type in German
 
           Important:

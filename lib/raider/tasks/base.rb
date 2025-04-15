@@ -14,15 +14,10 @@ module Raider
         # @context = context
       end
 
+      delegate :set_system_prompt, :chat, :chat_message_with_images, to: :@task_runner
+
       def process(prompt)
         raise NotImplementedError
-      end
-
-      def chat(prompt) = @task_runner.chat_message(prompt)
-
-      def chat_message_with_images(prompt, images)
-        images = images.map { base64_encode(it) }
-        @task_runner.chat_message_with_images(prompt:, images:)
       end
 
       def prompt
@@ -46,10 +41,6 @@ module Raider
           category: 'Document category'
         }
       end
-
-      private
-
-      def base64_encode(image) = Base64.strict_encode64(File.binread(image))
     end
   end
 end

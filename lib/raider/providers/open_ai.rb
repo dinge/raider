@@ -4,10 +4,10 @@ module Raider
   module Providers
     class OpenAi < Base
       MODELS = {
-        gpt_4o_mini: {
+        gpt4o_mini: {
           chat_model: 'gpt-4o-mini'
         },
-        gpt_4: {
+        gpt4: {
           chat_model: 'gpt-4'
         },
         o1_mini: {
@@ -30,22 +30,28 @@ module Raider
       end
 
       def to_messages_basic_with_images_to_json(prompt:)
-        [{
-          role: 'user',
-          content: [
-            { type: 'text', text: prompt }
-          ]
-        }]
+        to_message_with do
+          [{
+            role: 'user',
+            content: [
+              { type: 'text', text: prompt }
+            ],
+            response_format: :json
+          }]
+        end
       end
 
       def to_messages_basic_with_images_to_json(prompt:, images:)
-        [{
-          role: 'user',
-          content: [
-            { type: 'text', text: prompt },
-            { type: 'image_url', image_url: { url: "data:image/png;base64,#{images.first}" } }
-          ]
-        }]
+        to_message_with do
+          [{
+            role: 'user',
+            content: [
+              { type: 'text', text: prompt },
+              { type: 'image_url', image_url: { url: "data:image/png;base64,#{images.first}" } }
+            ],
+            response_format: :json
+          }]
+        end
       end
 
       def parse_raw_response(raw_response)
