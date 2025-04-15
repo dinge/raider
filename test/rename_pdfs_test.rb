@@ -26,7 +26,7 @@ module Raider
         FileUtils.touch(pdf_path)
 
         # Mock the PDF processing methods
-        Backers::PdfBacker.any_instance.stubs(:to_image).returns('test.png')
+        Poros::PdfUtil.any_instance.stubs(:to_image).returns('test.png')
 
         # Test the renaming process
         @renamer.process

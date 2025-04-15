@@ -34,6 +34,14 @@ module Raider
         TEXT
       end
 
+      def llm_options
+        { default_options: }
+      end
+
+      def default_options
+        {}
+      end
+
       def example_response_struct
         {
           description: 'your description after deep analysis',

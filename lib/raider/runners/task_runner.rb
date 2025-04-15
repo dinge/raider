@@ -3,7 +3,7 @@
 module Raider
   module Runners
     class TaskRunner
-      attr_reader :response, :response_message, :app, :llm, :provider, :system_prompt
+      attr_reader :response, :response_message, :app, :llm, :provider, :system_prompt, :current_task
 
       def initialize(app:, llm:, provider:)
         @app = app
@@ -11,15 +11,17 @@ module Raider
         @provider = provider
         # @context = context
 
+        @current_task_class = nil
+        @current_task = nil
         @system_prompt = 'You are a helpful agent.'
       end
 
       def process(task)
-        task_instance = Raider::Tasks.const_get(task.to_s.classify).const_get(@llm.llm_ident.to_s.classify)
-
-        # Raider::Tasks.const_get(task.to_s.classify)
-
-        task_instance.new(task_runner: self, app:, llm:, provider:)
+        @current_task_class = Raider::Tasks.const_get(task.to_s.classify)
+        if @current_task_class.const_defined?(@llm.llm_ident.to_s.classify)
+          @current_task_class = @current_task_class.const_get(@llm.llm_ident.to_s.classify)
+        end
+        @current_task = @current_task_class.new(task_runner: self, app:, llm:, provider:)
       end
 
       def llm_chat(**args)
@@ -35,6 +37,7 @@ module Raider
         @provider.provider_options
                  .deep_merge(@provider.llm_options_by_ident(@llm))
                  .deep_merge(@llm.llm_options)
+                 .deep_merge(@current_task.llm_options)
       end
 
       def set_system_prompt(system_prompt)

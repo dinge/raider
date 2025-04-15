@@ -20,11 +20,12 @@ module Raider
   end
 end
 
-# Raider.logger = Logger.new($stdout)
 Raider.logger = Logger.new(IO::NULL)
 Raider.logger.level = Logger::FATAL
 Langchain.logger.level = Logger::FATAL
-# Langchain.logger.level = Logger::INFO
+
+Langchain.logger.level = Logger::INFO
+Raider.logger = Logger.new($stdout)
 
 loader = Zeitwerk::Loader.new
 loader.tag = 'raider'
