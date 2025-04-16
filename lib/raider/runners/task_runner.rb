@@ -51,8 +51,8 @@ module Raider
       end
 
       def chat_message_with_images(prompt, images, system_prompt: nil)
-        images = images.map { base64_encode(it) }
         @provider.system_prompt = system_prompt || @system_prompt
+        images = images.map { base64_encode(it) }
         messages = @provider.to_messages_basic_with_images_to_json(prompt:, images:)
         parse_response(llm_chat(messages: messages))
       end

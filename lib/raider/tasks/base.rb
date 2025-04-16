@@ -44,9 +44,7 @@ module Raider
 
       def example_response_struct
         {
-          description: 'your description after deep analysis',
-          main_date: 'Main document date in YYYY-MM-DD format',
-          category: 'Document category'
+          response: 'your description after deep analysis'
         }
       end
     end

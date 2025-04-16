@@ -33,6 +33,14 @@ module Raider
           Always respond in valid JSON format.
         SYSTEM
       end
+
+      def example_response_struct
+        {
+          description: 'your description after deep analysis',
+          main_date: 'Main document date in YYYY-MM-DD format',
+          category: 'Document category'
+        }
+      end
     end
   end
 end

@@ -29,7 +29,7 @@ module Raider
           temperature: 0.1 }
       end
 
-      def to_messages_basic_with_images_to_json(prompt:)
+      def to_message_basic_to_json(prompt:)
         to_message_with do
           [{
             role: 'user',

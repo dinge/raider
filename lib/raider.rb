@@ -24,8 +24,8 @@ Raider.logger = Logger.new(IO::NULL)
 Raider.logger.level = Logger::FATAL
 Langchain.logger.level = Logger::FATAL
 
-Langchain.logger.level = Logger::INFO
-Raider.logger = Logger.new($stdout)
+# Langchain.logger.level = Logger::INFO
+# Raider.logger = Logger.new($stdout)
 
 loader = Zeitwerk::Loader.new
 loader.tag = 'raider'
