@@ -13,12 +13,16 @@ module Raider
           chat_model: 'meta-llama/Llama-3.2-11B-Vision-Instruct-Turbo'
         },
         llama3v2_vision_free: {
-          model: 'meta-llama/Llama-Vision-Free"',
-          chat_model: 'meta-llama/Llama-Vision-Free"'
+          model: 'meta-llama/Llama-Vision-Free',
+          chat_model: 'meta-llama/Llama-Vision-Free'
+        },
+        llama4_maverick_small: {
+          model: 'meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8',
+          chat_model: 'meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8'
         },
         qwen2v5_vl_large: {
-          model: 'Qwen/Qwen2-VL-72B-Instruct',
-          chat_model: 'Qwen/Qwen2-VL-72B-Instruct'
+          model: 'Qwen/Qwen2.5-VL-72B-Instruct',
+          chat_model: 'Qwen/Qwen2.5-VL-72B-Instruct'
         },
         qwen2_vl_large: {
           model: 'Qwen/Qwen2.5-VL-72B-Instruct',
@@ -26,7 +30,7 @@ module Raider
         }
       }.freeze
 
-      def client_class
+      def ruby_llm_client_class
         Langchain::LLM::OpenAI
       end
 

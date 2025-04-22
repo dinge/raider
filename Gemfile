@@ -7,10 +7,12 @@ gem 'base64'
 gem 'debug'
 gem 'faraday'
 gem 'json'
+gem 'json-schema-generator'
 gem 'langchainrb'
 gem 'pdf-reader'
 gem 'ruby-openai'
 gem 'ruby-vips'
+gem 'simple_json_schema_builder'
 gem 'slop'
 
 group :development, :test do

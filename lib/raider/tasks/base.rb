@@ -30,7 +30,7 @@ module Raider
       def json_instruct
         <<~TEXT
           Return ONLY a JSON object with this structure:
-          #{example_response_struct}
+          #{JSON.pretty_generate(example_response_struct)}
         TEXT
       end
 

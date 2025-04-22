@@ -15,7 +15,7 @@ module Raider
         }
       }.freeze
 
-      def client_class
+      def ruby_llm_client_class
         Langchain::LLM::OpenAI
       end
 

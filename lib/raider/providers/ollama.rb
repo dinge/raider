@@ -7,6 +7,9 @@ module Raider
         gemma3_small: {
           chat_model: 'gemma3:12b'
         },
+        gemma3_large: {
+          chat_model: 'gemma3:27b'
+        },
         llama3v2_vision_small: {
           chat_model: 'llama3.2-vision:11b'
         },
@@ -18,7 +21,7 @@ module Raider
         }
       }.freeze
 
-      def client_class
+      def ruby_llm_client_class
         Langchain::LLM::Ollama
       end
 

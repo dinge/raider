@@ -8,13 +8,6 @@ module Raider
         chat_message_with_images(prompt, [image])
       end
 
-      def prompt
-        <<~TEXT
-          describe all what you see, think deeply
-          #{json_instruct}
-        TEXT
-      end
-
       def system_prompt
         <<~SYSTEM
           You are a specialized document analysis expert with the following capabilities:
@@ -34,10 +27,17 @@ module Raider
         SYSTEM
       end
 
+      def prompt
+        <<~TEXT
+          describe all what you see, think deeply
+          #{json_instruct}
+        TEXT
+      end
+
       def example_response_struct
         {
           description: 'your description after deep analysis',
-          main_date: 'Main document date in YYYY-MM-DD format',
+          sender_date: 'Main document date in YYYY-MM-DD format',
           category: 'Document category'
         }
       end

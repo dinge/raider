@@ -10,7 +10,7 @@ module Raider
       def setup
         stub_llm_analysis
         @config = {
-          directory: 'test/fixtures',
+          input_directory: 'test/fixtures',
           force: false,
           debug: true,
           provider: :open_ai,

@@ -2,7 +2,7 @@
 
 module Raider
   module Llms
-    class Gemma3Small < Base
+    class Gemma3Large < Base
       def default_options
         {
           temperature: 0.1 # Lower temperature for more deterministic outputs in document analysis

@@ -23,10 +23,10 @@ begin
     exit 1
   end
 
-  directory = options.arguments.first || raise('Please provide a PDF file path')
-  raise "File not found: #{directory}" unless File.exist?(directory)
+  input_directory = options.arguments.first || raise('Please provide a PDF file path')
+  raise "File not found: #{input_directory}" unless File.exist?(input_directory)
 
-  Raider::Apps::DescribePdfs.new(options.to_h.merge(directory:)).process
+  Raider::Apps::DescribePdfs.new(options.to_h.merge(input_directory:)).process
 rescue StandardError => e
   puts "Error: #{e.class} - #{e.message}"
   puts e.backtrace

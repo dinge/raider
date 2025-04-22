@@ -3,7 +3,7 @@
 module Raider
   module Apps
     class Base
-      attr_accessor :config, :llm, :provider
+      attr_accessor :config, :llm, :provider, :llm_class
 
       def initialize(config)
         @config = config
@@ -12,13 +12,18 @@ module Raider
       def app_ident = self.class.name.split('::').last.underscore
 
       def pdf_files
-        Dir.glob(File.join(@config[:directory], '*.pdf'))
+        Dir.glob(File.join(@config[:input_directory], '*.pdf'))
       end
 
       def create_task(task, llm: nil, provider: nil)
         @provider = "Raider::Providers::#{provider || @config[:provider].classify}".constantize.new
         llm_class_name = (llm || @config[:llm] || @provider.default_llm_ident).to_s.classify
-        @llm = "Raider::Llms::#{llm_class_name}".constantize.new(app: self, provider: @provider)
+        @llm_class = if Raider::Llms.const_defined?(llm_class_name)
+                       Raider::Llms.const_get(llm_class_name)
+                     else
+                       Raider::Llms::Dummy
+                     end
+        @llm = @llm_class.new(app: self, provider: @provider)
         Runners::TaskRunner.new(app: self, llm: @llm, provider: @provider).process(task)
       end
 

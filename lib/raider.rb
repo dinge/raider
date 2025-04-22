@@ -34,8 +34,7 @@ loader.inflector.inflect(
   'llm' => 'LLM'
 )
 
-lib_path = Raider.root.join('lib')
-loader.push_dir(lib_path)
+loader.push_dir(Raider.root.join('lib'))
 loader.enable_reloading
 # loader.log!
 loader.setup

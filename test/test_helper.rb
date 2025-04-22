@@ -18,7 +18,7 @@ require 'raider'
 
 # Mock responses
 MOCK_LLM_RESPONSE = {
-  'main_date' => '2024-03-20',
+  'sender_date' => '2024-03-20',
   'sender_name' => 'Test Company',
   'category' => 'invoice'
 }.freeze

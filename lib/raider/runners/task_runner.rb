@@ -26,14 +26,14 @@ module Raider
 
       def llm_chat(**args)
         # puts args[:messages].first[:content].first
-        client.chat(**args)
+        ruby_llm_client.chat(**args)
       end
 
-      def client
-        @provider.client_class.new(**build_current_client_options)
+      def ruby_llm_client
+        @provider.ruby_llm_client_class.new(**build_current_ruby_llm_client_options)
       end
 
-      def build_current_client_options
+      def build_current_ruby_llm_client_options
         @provider.provider_options
                  .deep_merge(@provider.llm_options_by_ident(@llm))
                  .deep_merge(@llm.llm_options)
