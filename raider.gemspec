@@ -4,7 +4,7 @@ require_relative 'lib/raider'
 
 Gem::Specification.new do |spec|
   spec.name = 'raider'
-  spec.version = Raider::VERSION
+  spec.version = '0.1.2'
   spec.authors = ['Lars Gollnow']
   spec.email = ['lg@megorei.com']
 
