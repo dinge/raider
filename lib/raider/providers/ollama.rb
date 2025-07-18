@@ -18,6 +18,21 @@ module Raider
         },
         qwen2_vl_small: {
           chat_model: 'siasi/qwen2-vl-7b-instruct:latest'
+        },
+        granite3v22b_fp16: {
+          chat_model: 'granite3.2-vision:2b-fp16'
+        },
+        openfree_qwen2v5_vl32b_q8: {
+          chat_model: 'hf.co/openfree/Qwen2.5-VL-32B-Instruct-Q8_0-GGUF:Q8_0'
+        },
+        unsloth_gemma3_27b_Q5: {
+          chat_model: 'hf.co/unsloth/gemma-3-27b-it-GGUF:Q5'
+        },
+        unsloth_qwen2v5_vl32b_q4: {
+          chat_model: 'hf.co/openfree/Qwen2.5-VL-32B-Instruct-Q4_K_M-GGUF:Q4_K_M'
+        },
+        qwen2v532b: {
+          chat_model: 'qwen2.5:32b'
         }
       }.freeze
 

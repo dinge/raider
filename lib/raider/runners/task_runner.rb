@@ -3,13 +3,18 @@
 module Raider
   module Runners
     class TaskRunner
-      attr_reader :response, :response_message, :app, :llm, :provider, :system_prompt, :current_task
+      attr_reader :app, :llm, :provider
+      attr_reader :agent
+      attr_reader :system_prompt, :current_task, :current_context
+      attr_reader :llm_response, :raw_response, :response_message, :parsed_response
 
-      def initialize(app:, llm:, provider:)
+      alias context current_context
+
+      def initialize(app:, llm:, provider:, agent: nil)
         @app = app
         @llm = llm
         @provider = provider
-        # @context = context
+        @agent = agent
 
         @current_task_class = nil
         @current_task = nil
@@ -21,11 +26,14 @@ module Raider
         if @current_task_class.const_defined?(@llm.llm_ident.to_s.classify)
           @current_task_class = @current_task_class.const_get(@llm.llm_ident.to_s.classify)
         end
-        @current_task = @current_task_class.new(task_runner: self, app:, llm:, provider:)
+        @current_task = @current_task_class.new(task_runner: self, app:, llm:, provider:, agent:)
+        @current_context = @current_task.context
+        @current_task
       end
 
       def llm_chat(**args)
         # puts args[:messages].first[:content].first
+        #
         ruby_llm_client.chat(**args)
       end
 
@@ -35,9 +43,9 @@ module Raider
 
       def build_current_ruby_llm_client_options
         @provider.provider_options
-                 .deep_merge(@provider.llm_options_by_ident(@llm))
-                 .deep_merge(@llm.llm_options)
-                 .deep_merge(@current_task.llm_options)
+                 # .deep_merge(@provider.llm_options_by_ident(@llm))
+                 # .deep_merge(@llm.llm_options)
+                 # .deep_merge(@current_task.llm_options)
       end
 
       def set_system_prompt(system_prompt)
@@ -45,8 +53,13 @@ module Raider
       end
 
       def chat(prompt, system_prompt: nil)
+#        debugger
+        prompt_struct = prompt
+        prompt = "```json\n#{JSON.pretty_generate(prompt)}\n```" if prompt.is_a?(Hash)
+        # prompt = prompt.to_s
         @provider.system_prompt = system_prompt || @system_prompt
         messages = @provider.to_message_basic_to_json(prompt:)
+        @current_context.input = prompt_struct
         parse_response(llm_chat(messages: messages))
       end
 
@@ -57,11 +70,15 @@ module Raider
         parse_response(llm_chat(messages: messages))
       end
 
-      def parse_response(response)
-        @response = response
-        @response_message = @provider.parse_raw_response(@response.raw_response)
-        parse_json_safely(@response_message).tap do |json_response|
-          log_response(@response.raw_response, json_response)
+      def parse_response(llm_response)
+        @llm_response = llm_response
+        @raw_response = @llm_response.raw_response
+        @response_message = @provider.parse_raw_response(@raw_response)
+
+        parse_json_safely(@response_message).tap do |hash_response|
+          @parsed_response = hash_response
+          @current_context.output = hash_response
+          log_response(@raw_response, hash_response)
         end
       end
 
@@ -73,19 +90,19 @@ module Raider
           llm_message: str }
       end
 
-      def log_response(raw_response, json_response)
-        FileUtils.mkdir_p('logs')
+      def log_response(raw_response, hash_response)
+        FileUtils.mkdir_p('log/raider')
 
         entry = {
           timestamp: Time.now.iso8601,
-          config: @app.config,
+          app_context: @app.app_context,
           raw_response:,
-          json_response:
+          hash_response:
         }
 
-        puts JSON.pretty_generate(entry) if @app.config[:debug]
+        puts JSON.pretty_generate(entry) if @app.app_context[:debug]
 
-        log_file = "logs/#{@app.app_ident}--#{@llm.llm_ident}-#{@provider.provider_ident}.log"
+        log_file = "log/raider/#{@app.app_ident}--#{@provider.provider_ident}--#{@llm.llm_ident}.log"
         File.open(log_file, 'a') do |f|
           f.puts [entry].to_yaml
         end

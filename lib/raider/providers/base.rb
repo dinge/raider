@@ -19,6 +19,7 @@ module Raider
       end
 
       def default_llm_ident = self.class::MODELS.keys.first
+
       def default_model = self.class::MODELS.values.first[:chat_model]
       def ruby_llm_client_class = raise NotImplementedError
 

@@ -9,14 +9,14 @@ module Raider
 
       def setup
         stub_llm_analysis
-        @config = {
+        @app_context = {
           input_directory: 'test/fixtures',
           force: false,
           debug: true,
           provider: :open_ai,
           dpi: 200
         }
-        @renamer = RenamePdfs.new(@config)
+        @renamer = RenamePdfs.new(@app_context)
       end
 
       def test_processes_pdf_file

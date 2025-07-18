@@ -4,7 +4,7 @@ module Raider
   module Apps
     class DescribePdfs < Base
       def process
-        @pdf_util = Poros::PdfUtil.new(dpi: config[:dpi])
+        @pdf_util = Poros::PdfUtil.new(dpi: app_context.dpi)
         process_files
       end
 

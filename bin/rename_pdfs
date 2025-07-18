@@ -12,7 +12,7 @@ begin
   options = Slop.parse do |o|
     o.banner = 'Usage: ruby rename_pdfs.rb [INPUT_DIRECTORY] [OUTPUT_DIRECTORY] [options]'
     o.bool '-h', '--help', 'Show help', default: false
-    o.bool '-d', '--debug', 'Show/hide analysis details', default: false
+    o.bool '-d', '--debug', 'Show/hide analysis details', default: true
     o.string '-p', '--provider', "LLM provider (#{Raider::Providers::Base.available.join('/')})", default: 'open_ai'
     o.string '-l', '--llm', "LLM (#{Raider::Llms::Base.available.join('/')})"
     o.integer '--dpi', 'DPI for PDF conversion', default: 200
@@ -24,13 +24,13 @@ begin
     exit 1
   end
 
-  input_directory = options.arguments.first || '.'
-  raise "Directory not found: #{input_directory}" unless Dir.exist?(input_directory)
+  input_path = options.arguments.first || '.'
+  raise "Directory not found: #{input_path}" unless File.exist?(input_path)
 
   output_directory = options.arguments.second || '.'
   raise "Directory not found: #{output_directory}" unless Dir.exist?(output_directory)
 
-  Raider::Apps::RenamePdfs.new(options.to_h.merge(input_directory:, output_directory:)).process
+  Raider::Apps::RenamePdfs.new(options.to_h.merge(input_path:, output_directory:)).process
 rescue StandardError => e
   puts "Error: #{e.class} - #{e.message}"
   puts e.backtrace

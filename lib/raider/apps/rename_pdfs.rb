@@ -3,18 +3,24 @@
 module Raider
   module Apps
     class RenamePdfs < Base
-      VALID_RECEIVERS = %w[firma-pflaum megorei produktgenuss unknown]
+      VALID_RECEIVERS = %w[firma-pflaum megorei produktgenuss gollnow unknown]
 
       def process
-        @pdf_util = Poros::PdfUtil.new(dpi: @config[:dpi])
-        @output_directory = @config[:output_directory]
-        process_files
+        @pdf_util = Poros::PdfUtil.new(dpi: app_context.dpi)
+        @input_path = app_context.input_path
+        @output_directory = app_context.output_directory
+
+        if Dir.exist?(@input_path)
+          process_files
+        else
+          process_file(@input_path)
+        end
       end
 
       private
 
       def process_files
-        pdf_files.each { |pdf| process_file(pdf) }
+        pdf_files.each { process_file(it) }
       end
 
       def process_file(input_path)
@@ -32,14 +38,20 @@ module Raider
         new_name = generate_filename(response)
 
         output_directory = File.join(@output_directory, valid_receiver_name)
-        rename_file(input_path, output_directory, new_name, force: @config[:force])
+        rename_file(input_path, output_directory, new_name, force: app_context.force)
         cleanup(img)
       end
 
       def perform_tasks
-        task.vision.business_letter.basic_info(image, app.base.valid_receivers).then do
+        response = task.vision.basic_info.business_letter(image, app.base.valid_receivers).then do
           task.correctors.value_corrector(it.receiver_name, app.base.valid_receivers)
         end
+
+        new_name = generate_filename(response)
+
+        output_directory = File.join(@output_directory, valid_receiver_name)
+        rename_file(input_path, output_directory, new_name, force: app_context.force)
+        cleanup(img)
       end
 
       def generate_filename(response)

@@ -3,17 +3,22 @@
 module Raider
   module Runners
     class AgentRunner
-      attr_reader :response, :response_message, :app, :llm, :provider
+      attr_reader :app, :llm, :provider
+      attr_reader :current_agent, :current_context
+
+      alias context current_context
 
       def initialize(app:, llm:, provider:)
         @app = app
         @llm = llm
         @provider = provider
-        # @context = context
       end
 
-      def process(task)
-        Raider::Agents.const_get(task.to_s.classify).new(agent_runner: self, app:, llm:, provider:)
+      def process(agent_ident, input:)
+        # @current_agent = Raider::Agents.const_get(task.to_s.classify).new(app:, llm:, provider:, agent_runner: self)
+        @current_agent = Raider::Agents::Base.new(app:, llm:, provider:, agent_runner: self, input:)
+        @current_context = @current_agent.agent_context
+        @current_agent
       end
     end
   end

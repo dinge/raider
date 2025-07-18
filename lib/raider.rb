@@ -8,7 +8,9 @@ require 'base64'
 require 'json'
 require 'logger'
 require 'fileutils'
+require 'recursive_open_struct'
 require 'debug'
+
 
 module Raider
   class << self
@@ -38,3 +40,5 @@ loader.push_dir(Raider.root.join('lib'))
 loader.enable_reloading
 # loader.log!
 loader.setup
+
+require 'raider/railtie' if defined?(Rails::Railtie)

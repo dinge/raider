@@ -12,6 +12,7 @@ gem 'langchainrb'
 gem 'pdf-reader'
 gem 'ruby-openai'
 gem 'ruby-vips'
+gem 'recursive-open-struct'
 gem 'simple_json_schema_builder'
 gem 'slop'
 

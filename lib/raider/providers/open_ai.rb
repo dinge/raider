@@ -4,6 +4,9 @@ module Raider
   module Providers
     class OpenAi < Base
       MODELS = {
+        gpt4_1: {
+          chat_model: 'gpt-4.1'
+        },
         gpt4o_mini: {
           chat_model: 'gpt-4o-mini'
         },
@@ -25,7 +28,7 @@ module Raider
       end
 
       def default_options
-        { model: default_model,
+        { chat_model: default_model,
           temperature: 0.1 }
       end
 
@@ -36,7 +39,7 @@ module Raider
             content: [
               { type: 'text', text: prompt }
             ],
-            response_format: :json
+            response_format: :json_object
           }]
         end
       end
@@ -49,7 +52,7 @@ module Raider
               { type: 'text', text: prompt },
               { type: 'image_url', image_url: { url: "data:image/png;base64,#{images.first}" } }
             ],
-            response_format: :json
+            response_format: :json_object
           }]
         end
       end

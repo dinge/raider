@@ -3,15 +3,21 @@
 module Raider
   module Tasks
     class Base
-      attr_accessor :context
+      attr_reader :app, :llm, :provider
+      attr_reader :agent
       attr_reader :task_runner
+      attr_accessor :task_context
 
-      def initialize(task_runner:, app:, llm:, provider:)
-        @task_runner = task_runner
+      alias context task_context
+
+      def initialize(task_runner:, app:, llm:, provider:, agent: nil)
         @app = app
         @llm = llm
         @provider = provider
-        # @context = context
+        @agent = agent
+
+        @task_runner = task_runner
+        @task_context = Utils::TaskContext.new(provider: @provider.provider_ident, llm: @llm.llm_ident)
       end
 
       delegate :set_system_prompt, :chat, :chat_message_with_images, to: :@task_runner
@@ -29,8 +35,11 @@ module Raider
 
       def json_instruct
         <<~TEXT
-          Return ONLY a JSON object with this structure:
-          #{JSON.pretty_generate(example_response_struct)}
+          ## Output
+          Return **only** the JSON object below—nothing else. Keep key order fixed.
+          ```json
+            #{JSON.pretty_generate(example_response_struct)}
+          ```
         TEXT
       end
 
