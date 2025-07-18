@@ -4,7 +4,7 @@ require_relative 'lib/raider'
 
 Gem::Specification.new do |spec|
   spec.name = 'raider'
-  spec.version = '0.1.2'
+  spec.version = '0.1.3'
   spec.authors = ['Lars Gollnow']
   spec.email = ['lg@megorei.com']
 
@@ -48,6 +48,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'ruby-vips'
   spec.add_dependency 'simple_json_schema_builder'
   spec.add_dependency 'slop'
+  spec.add_dependency 'zeitwerk'
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html

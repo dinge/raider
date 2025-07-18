@@ -15,6 +15,7 @@ gem 'ruby-vips'
 gem 'recursive-open-struct'
 gem 'simple_json_schema_builder'
 gem 'slop'
+gem 'zeitwerk'
 
 group :development, :test do
   gem 'minitest'
@@ -24,5 +25,4 @@ group :development, :test do
   gem 'rubocop'
   gem 'rubocop-rails'
   gem 'simplecov'
-  gem 'zeitwerk'
 end
