@@ -45,7 +45,6 @@ module Raider
       def default_options
         {
           chat_model: default_model,
-          chat_model: default_model,
           temperature: 0.1
         }
       end
