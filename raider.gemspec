@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative 'lib/raider'
-
 Gem::Specification.new do |spec|
   spec.name = 'raider'
   spec.version = '0.1.3'
