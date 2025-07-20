@@ -22,9 +22,9 @@ module Raider
       end
 
       def process(task)
-        @current_task_class = Raider::Tasks.const_get(task.to_s.classify)
-        if @current_task_class.const_defined?(@llm.llm_ident.to_s.classify)
-          @current_task_class = @current_task_class.const_get(@llm.llm_ident.to_s.classify)
+        @current_task_class = Raider::Tasks.const_get(task.to_s.camelize)
+        if @current_task_class.const_defined?(@llm.llm_ident.to_s.camelize)
+          @current_task_class = @current_task_class.const_get(@llm.llm_ident.to_s.camelize)
         end
         @current_task = @current_task_class.new(task_runner: self, app:, llm:, provider:, agent:)
         @current_context = @current_task.context

@@ -49,7 +49,7 @@ module Raider
       end
 
       def init_provider(provider)
-        @provider = "Raider::Providers::#{provider || @app_context.provider.to_s.classify}".constantize.new
+        @provider = "Raider::Providers::#{provider || @app_context.provider.to_s.camelize}".constantize.new
       end
 
       def init_llm
@@ -57,7 +57,7 @@ module Raider
       end
 
       def init_llm_class(llm)
-        llm_class_name = (llm || app_context.llm || @provider.default_llm_ident).to_s.classify
+        llm_class_name = (llm || app_context.llm || @provider.default_llm_ident).to_s.camelize
         @llm_class = if Raider::Llms.const_defined?(llm_class_name)
                        Raider::Llms.const_get(llm_class_name)
                      else
@@ -75,8 +75,8 @@ module Raider
       # end
 
       # def run_with_setup(llm:, provider:)
-      #   p = "Raider::Providers::#{provider || @app_context[:provider].classify}".constantize.new
-      #   llm_class_name = (llm || @app_context[:llm] || p.default_llm_ident).to_s.classify
+      #   p = "Raider::Providers::#{provider || @app_context[:provider].camelize}".constantize.new
+      #   llm_class_name = (llm || @app_context[:llm] || p.default_llm_ident).to_s.camelize
       #   l= "Raider::Llms::#{llm_class_name}".constantize.new(app: self, provider: p)
       #   Runners::TaskRunner.new(app: self, llm: @llm, provider: @provider).process(task)
       # end
