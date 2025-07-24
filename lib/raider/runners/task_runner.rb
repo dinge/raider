@@ -41,6 +41,10 @@ module Raider
         @provider.ruby_llm_client_class.new(**build_current_ruby_llm_client_options)
       end
 
+      def ruby_llm_base_client
+        ruby_llm_client.client
+      end
+
       def build_current_ruby_llm_client_options
         @provider.provider_options
                  # .deep_merge(@provider.llm_options_by_ident(@llm))
@@ -53,7 +57,6 @@ module Raider
       end
 
       def chat(prompt, system_prompt: nil)
-#        debugger
         prompt_struct = prompt
         prompt = "```json\n#{JSON.pretty_generate(prompt)}\n```" if prompt.is_a?(Hash)
         # prompt = prompt.to_s

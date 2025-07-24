@@ -20,7 +20,7 @@ module Raider
         @task_context = Utils::TaskContext.new(provider: @provider.provider_ident, llm: @llm.llm_ident)
       end
 
-      delegate :set_system_prompt, :chat, :chat_message_with_images, to: :@task_runner
+      delegate :set_system_prompt, :chat, :ruby_llm_base_client, :chat_message_with_images, to: :@task_runner
 
       def process(prompt)
         raise NotImplementedError
