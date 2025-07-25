@@ -10,6 +10,9 @@ module Raider
         gpt4o_mini: {
           chat_model: 'gpt-4o-mini'
         },
+        gpt41_mini: {
+          chat_model: 'gpt-4o-mini'
+        },
         gpt4: {
           chat_model: 'gpt-4'
         },

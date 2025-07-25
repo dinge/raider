@@ -47,9 +47,9 @@ module Raider
 
       def build_current_ruby_llm_client_options
         @provider.provider_options
-                 # .deep_merge(@provider.llm_options_by_ident(@llm))
-                 # .deep_merge(@llm.llm_options)
-                 # .deep_merge(@current_task.llm_options)
+                 .deep_merge(@provider.llm_options_by_ident(@llm))
+                 .deep_merge(@llm.llm_options)
+                 .deep_merge(@current_task.llm_options)
       end
 
       def set_system_prompt(system_prompt)
