@@ -28,15 +28,21 @@ module Raider
 
       def run_task(task_ident, **args)
         task = app.create_task(task_ident, llm: nil, provider: nil, agent: self)
+        app.context.vcr_key ? run_task_with_vcr(task, task_ident, **args) : run_task_without_vcr(task, **args)
+        agent_context.tasks << { task_ident.to_sym => task.context.to_hash }
+        task.task_runner
+      end
 
+      def run_task_with_vcr(task, task_ident, **args)
         WebMock.enable!
         VCR.use_cassette(build_vcr_key(task_ident), record: :new_episodes) do
           task.process(**args)
         end
         WebMock.disable!
+      end
 
-        agent_context.tasks << { task_ident.to_sym => task.context.to_hash }
-        task.task_runner
+      def run_task_without_vcr(task, **args)
+        task.process(**args)
       end
 
       def build_vcr_key(task_ident)
