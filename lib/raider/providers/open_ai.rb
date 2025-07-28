@@ -18,6 +18,9 @@ module Raider
         },
         o1_mini: {
           chat_model: 'o1-mini'
+        },
+        o3_mini: {
+          chat_model: 'o3-mini'
         }
       }.freeze
 
@@ -31,8 +34,9 @@ module Raider
       end
 
       def default_options
-        { chat_model: default_model,
-          temperature: 0.1 }
+        # { chat_model: default_model,
+        #   temperature: 0.1 }
+        { chat_model: default_model }
       end
 
       def to_message_basic_to_json(prompt:)
