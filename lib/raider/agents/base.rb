@@ -46,11 +46,12 @@ module Raider
       end
 
       def build_vcr_key(task_ident)
+        current_number_of_tasks = agent_context.select_task_names(task_ident).count
         [
           app.app_ident,
           app.context.vcr_key.version_key,
           app.context.vcr_key.source_ident,
-          [task_ident, @llm.llm_ident, app.context.vcr_key.reprocess_ident].join('--')
+          [task_ident, current_number_of_tasks, @llm.llm_ident, app.context.vcr_key.reprocess_ident].join('--')
          ].join('/')
       end
     end

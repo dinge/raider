@@ -8,6 +8,10 @@ module Raider
         TaskContext.new(task_context)
       end
 
+      def select_task_names(task_ident)
+        tasks.select { it.keys.include?(task_ident) }.map(&:values)
+      end
+
       def task_response_from(task_ident)
         find_task(task_ident).response
       end
