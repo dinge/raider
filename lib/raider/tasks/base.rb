@@ -7,6 +7,7 @@ module Raider
       attr_reader :agent
       attr_reader :task_runner
       attr_accessor :task_context
+      attr_reader :input, :inputs
 
       alias context task_context
 
