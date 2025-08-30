@@ -41,7 +41,7 @@ module Raider
         @provider.ruby_llm_client_class.new(**build_current_ruby_llm_client_options)
       end
 
-      def ruby_llm_base_client
+      def ruby_llm_base_client # like OpenAI::Client.new
         ruby_llm_client.client
       end
 

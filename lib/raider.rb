@@ -13,7 +13,7 @@ require 'debug'
 
 
 module Raider
-  VERSION = "0.1.13"
+  VERSION = "0.1.14"
 
   class << self
     attr_accessor :logger
@@ -24,12 +24,13 @@ module Raider
   end
 end
 
-Raider.logger = Logger.new(IO::NULL)
-Raider.logger.level = Logger::FATAL
-Langchain.logger.level = Logger::FATAL
+# Raider.logger = Logger.new(IO::NULL)
+# Raider.logger.level = Logger::FATAL
+# Langchain.logger.level = Logger::FATAL
 
-# Langchain.logger.level = Logger::INFO
-# Raider.logger = Logger.new($stdout)
+Raider.logger = Logger.new($stdout)
+Raider.logger.level = Logger::INFO
+Langchain.logger.level = Logger::INFO
 
 loader = Zeitwerk::Loader.new
 loader.tag = 'raider'

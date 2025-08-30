@@ -21,7 +21,16 @@ module Raider
         },
         o3_mini: {
           chat_model: 'o3-mini'
-        }
+        },
+        gpt5: {
+          chat_model: 'gpt-5'
+        },
+        gpt5_mini: {
+          chat_model: 'gpt-5-mini'
+        },
+        gpt5_nano: {
+          chat_model: 'gpt-5-nano'
+        },
       }.freeze
 
       def ruby_llm_client_class
@@ -36,7 +45,8 @@ module Raider
       def default_options
         # { chat_model: default_model,
         #   temperature: 0.1 }
-        { chat_model: default_model }
+        { chat_model: default_model,
+          request_timeout: 240 }
       end
 
       def to_message_basic_to_json(prompt:)
