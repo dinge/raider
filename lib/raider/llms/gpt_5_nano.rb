@@ -2,7 +2,7 @@
 
 module Raider
   module Llms
-    class Gpt5Thinking < Base
+    class Gpt5Nano < Base
       def default_options
         {
         }
