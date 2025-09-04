@@ -13,6 +13,8 @@ module Raider
 
       def app = self
 
+      delegate :input, :inputs, :output, :outputs, to: :app_context
+
       def initialize(app_context = {})
         @app_context = Utils::AppContext.new(
           app_context.reverse_merge(provider:, agents: [], tasks: [], data: {}, outputs: {})
