@@ -13,7 +13,7 @@ require 'debug'
 
 
 module Raider
-  VERSION = "0.1.17"
+  VERSION = "0.1.18"
 
   class << self
     attr_accessor :logger

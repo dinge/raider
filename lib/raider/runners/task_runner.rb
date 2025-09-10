@@ -34,6 +34,7 @@ module Raider
       def llm_chat(**args)
         # puts args[:messages].first[:content].first
         #
+
         ruby_llm_client.chat(**args)
       end
 
@@ -105,7 +106,7 @@ module Raider
 
         puts JSON.pretty_generate(entry) if @app.app_context[:debug]
 
-        log_file = "log/raider/#{@app.app_ident}--#{@provider.provider_ident}--#{@llm.llm_ident}.log"
+        log_file = "log/raider/#{@app.app_ident}--#{@current_task.ident}--#{@provider.provider_ident}--#{@llm.llm_ident}.log"
         File.open(log_file, 'a') do |f|
           f.puts [entry].to_yaml
         end
