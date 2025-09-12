@@ -76,13 +76,7 @@ module Raider
         regular_response = process_llm_response(llm_chat(messages: messages))
 
         if @current_task.tools && @messages.size == 4
-          # process_llm_response(llm_chat(messages: @messages)) # .to_yaml
-          @current_context.output =
-            @tool_call_results.group_by do |hash|
-              hash[:name]
-            end.transform_values do |arr|
-              arr.map { |h| h[:content] }
-            end
+          prepare_tool_response
         else
           regular_response
         end
@@ -93,6 +87,16 @@ module Raider
         images = images.map { base64_encode(it) }
         @messages.push(*(messages = @provider.to_messages_basic_with_images_to_json(prompt:, images:)))
         process_llm_response(llm_chat(messages: messages))
+      end
+
+      def prepare_tool_response
+        # process_llm_response(llm_chat(messages: @messages)) # .to_yaml
+        @current_context.output =
+          @tool_call_results.group_by do |hash|
+            hash[:name]
+          end.transform_values do |arr|
+            arr.map { |h| h[:content] }
+          end
       end
 
       def process_llm_response(llm_response)
