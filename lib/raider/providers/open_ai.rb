@@ -49,7 +49,7 @@ module Raider
           request_timeout: 240 }
       end
 
-      def to_message_basic_to_json(prompt:)
+      def to_messages_basic_to_json(prompt:)
         to_message_with do
           [{
             role: 'user',
@@ -75,7 +75,12 @@ module Raider
       end
 
       def parse_raw_response(raw_response)
-        raw_response['choices']&.first&.dig('message', 'content')
+        raw_response.dig('choices', 0, 'message', 'content')
+      end
+
+      def parse_tool_calls(raw_response)
+        # dig("choices", 0, "message", 'role') == 'assistant'
+        raw_response.dig('choices', 0, 'message', 'tool_calls')
       end
     end
   end

@@ -30,7 +30,7 @@ end
 
 Raider.logger = Logger.new($stdout)
 Raider.logger.level = Logger::INFO
-Langchain.logger.level = Logger::INFO
+Langchain.logger.level = Logger::DEBUG
 
 loader = Zeitwerk::Loader.new
 loader.tag = 'raider'

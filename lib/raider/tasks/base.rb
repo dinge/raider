@@ -46,6 +46,10 @@ module Raider
         TEXT
       end
 
+      def tools
+        {}
+      end
+
       def llm_options
         { default_options: }
       end
