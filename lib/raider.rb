@@ -13,7 +13,7 @@ require 'debug'
 
 
 module Raider
-  VERSION = "0.2"
+  VERSION = "0.2.1"
 
   class << self
     attr_accessor :logger
@@ -30,6 +30,9 @@ end
 
 Raider.logger = Logger.new($stdout)
 Raider.logger.level = Logger::INFO
+Langchain.logger.level = Logger::DEBUG
+
+# Langchain.logger = Logger.new('log/langchain.log', **Langchain::LOGGER_OPTIONS)
 Langchain.logger.level = Logger::DEBUG
 
 loader = Zeitwerk::Loader.new

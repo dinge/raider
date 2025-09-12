@@ -35,7 +35,7 @@ module Raider
       end
 
       def llm_chat(**args)
-        if (tools = @current_task.tools) && @messages.size == 2
+        if (tools = @current_task.tools).present? && @messages.size == 2
           args.merge!(tools:, tool_choice: 'required')
         end
 
@@ -75,7 +75,7 @@ module Raider
         @current_context.input = prompt_struct
         regular_response = process_llm_response(llm_chat(messages: messages))
 
-        if @current_task.tools && @messages.size == 4
+        if @current_task.tools.present? && @messages.size >= 4
           prepare_tool_response
         else
           regular_response
@@ -103,7 +103,7 @@ module Raider
         @llm_response = llm_response
         @raw_response = @llm_response.raw_response
 
-        if @current_task.tools && (@tool_calls = @provider.parse_tool_calls(@raw_response).presence)
+        if @current_task.tools.present? && (@tool_calls = @provider.parse_tool_calls(@raw_response).presence)
           process_tool_chain
         else
           process_regular_response
