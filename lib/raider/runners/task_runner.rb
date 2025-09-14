@@ -20,6 +20,7 @@ module Raider
         @current_task = nil
         @system_prompt = 'You are a helpful agent.'
         @messages = []
+        @llm_usages = []
         @tool_calls = []
         @tool_call_results = []
       end
@@ -39,11 +40,6 @@ module Raider
           args.merge!(tools:, tool_choice: 'required')
         end
 
-        puts "-----------------------------------------------------------"
-        puts args
-        puts "-----------------------------------------------------------"
-
-
         ruby_llm_client.chat(**args)
       end
 
@@ -62,24 +58,25 @@ module Raider
                  .deep_merge(@current_task.llm_options)
       end
 
-      def set_system_prompt(system_prompt)
-        @system_prompt = system_prompt
-      end
+      def set_system_prompt(system_prompt) = @system_prompt = system_prompt
 
       def chat(prompt, system_prompt: nil)
-        prompt_struct = prompt
+        @current_context.input = prompt
         prompt = "```json\n#{JSON.pretty_generate(prompt)}\n```" if prompt.is_a?(Hash)
         # prompt = prompt.to_s
         @provider.system_prompt = system_prompt || @system_prompt
         @messages.push(*(messages = @provider.to_messages_basic_to_json(prompt:)))
-        @current_context.input = prompt_struct
-        regular_response = process_llm_response(llm_chat(messages: messages))
+        processed_llm_response = process_llm_response(llm_chat(messages: messages))
+        @current_context.messages = @messages
+        @current_context.llm_usage = @provider.parse_usage(@raw_response).presence
 
-        if @current_task.tools.present? && @messages.size >= 4
-          prepare_tool_response
-        else
-          regular_response
-        end
+        @current_context.output =
+          if @current_task.with_tools? && @messages.size >= 4
+            @current_context.tool_calls = @tool_call_results.map { it.slice(:name, :tool_args) }
+            build_tool_response
+          else
+            processed_llm_response
+          end
       end
 
       def chat_message_with_images(prompt, images, system_prompt: nil)
@@ -89,21 +86,21 @@ module Raider
         process_llm_response(llm_chat(messages: messages))
       end
 
-      def prepare_tool_response
+      def build_tool_response
         # process_llm_response(llm_chat(messages: @messages)) # .to_yaml
-        @current_context.output =
-          @tool_call_results.group_by do |hash|
-            hash[:name]
-          end.transform_values do |arr|
-            arr.map { |h| h[:content] }
-          end
+        @tool_call_results.group_by do |hash|
+          hash[:name]
+        end.transform_values do |arr|
+          arr.map { |h| h[:content] }
+        end
       end
 
       def process_llm_response(llm_response)
         @llm_response = llm_response
         @raw_response = @llm_response.raw_response
+        @messages.push(@raw_response.dig('choices', 0, 'message'))
 
-        if @current_task.tools.present? && (@tool_calls = @provider.parse_tool_calls(@raw_response).presence)
+        if @current_task.with_tools? && (@tool_calls = @provider.parse_tool_calls(@raw_response).presence)
           process_tool_chain
         else
           process_regular_response
@@ -112,29 +109,30 @@ module Raider
 
       def process_tool_chain
         log_response(@raw_response, {})
-        @messages.push(@raw_response.dig('choices', 0, 'message'))
-        @tool_call_results = process_tool_calls
+        @tool_call_results = @tool_calls.map(&method(:process_tool_call))
         @messages.push(*@tool_call_results)
       end
 
-      def process_tool_calls
-        @tool_calls.map do
-          { tool_call_id: it['id'],
-            role: 'tool',
-            name: it['function']['name'] ,
-            content: call_tool_method(it['function']['name'], it['function']['arguments']) }
-        end
+      def process_tool_call(tool_call)
+        tool_method = tool_call.dig('function', 'name')
+        tool_args = JSON.parse(tool_call.dig('function', 'arguments'), symbolize_names: true)
+        {
+          tool_call_id: tool_call.dig('id'),
+          role: 'tool',
+          name: tool_method ,
+          content: call_tool_method(tool_method, tool_args),
+          tool_args:
+        }
       end
 
-      def call_tool_method(tool_method, tool_args_json)
-        @current_task.send("#{tool_method}_tool", **JSON.parse(tool_args_json, symbolize_names: true))
+      def call_tool_method(tool_method, tool_args)
+        @current_task.send("#{tool_method}_tool", **tool_args)
       end
 
       def process_regular_response
         @response_message = @provider.parse_raw_response(@raw_response)
         parse_json_safely(@response_message).tap do |hash_response|
           @parsed_response = hash_response
-          @current_context.output = hash_response
           log_response(@raw_response, hash_response)
         end
       end

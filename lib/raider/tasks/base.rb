@@ -29,6 +29,8 @@ module Raider
         raise NotImplementedError
       end
 
+      def with_tools? = tools.present?
+
       def prompt
         <<~TEXT
           describe all what you see, think deeply

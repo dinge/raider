@@ -82,6 +82,10 @@ module Raider
         # dig("choices", 0, "message", 'role') == 'assistant'
         raw_response.dig('choices', 0, 'message', 'tool_calls')
       end
+
+      def parse_usage(raw_response)
+        raw_response.dig('usage')
+      end
     end
   end
 end

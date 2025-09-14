@@ -49,6 +49,18 @@ module Raider
           content: system_prompt
         }
       end
+
+      def parse_raw_response(raw_response)
+        { raw_response: }
+      end
+
+      def parse_tool_calls(raw_response)
+        {}
+      end
+
+      def parse_usage(raw_response)
+        {}
+      end
     end
   end
 end
