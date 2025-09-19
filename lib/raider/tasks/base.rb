@@ -21,7 +21,7 @@ module Raider
         @task_context = Utils::TaskContext.new(provider: @provider.provider_ident, llm: @llm.llm_ident)
       end
 
-      delegate :set_system_prompt, :chat, :ruby_llm_base_client, :chat_message_with_images, to: :@task_runner
+      delegate :set_system_prompt, :chat, :ruby_llm_base_client, :chat_message_with_images, :chat_with_responses, to: :@task_runner
 
       def ident = self.class.name.split('::').last.underscore.to_sym
 
