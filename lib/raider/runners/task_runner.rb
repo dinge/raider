@@ -23,6 +23,8 @@ module Raider
         @llm_usages = []
         @tool_calls = []
         @tool_call_results = []
+        @grouped_tool_call_results = {}
+        @process_tool_response = false
       end
 
       def process(task)
@@ -84,14 +86,15 @@ module Raider
 
       def set_system_prompt(system_prompt) = @system_prompt = system_prompt
 
-      def chat(prompt, system_prompt: nil)
-        process_request(prompt, system_prompt:) { llm_chat(**it) }
+      def chat(prompt, system_prompt: nil, process_tool_response: false)
+        process_request(prompt, system_prompt:, process_tool_response:) { llm_chat(**it) }
       end
 
-      def process_request(prompt, system_prompt:)
+      def process_request(prompt, system_prompt:, process_tool_response:)
         prompt = "```json\n#{JSON.pretty_generate(prompt)}\n```" if prompt.is_a?(Hash)
         @current_context.input = prompt
         @provider.system_prompt = system_prompt || @system_prompt
+        @process_tool_response = process_tool_response
 
         messages = @provider.to_messages_basic_to_json(prompt:)
         add_to_messages(messages)
@@ -126,6 +129,22 @@ module Raider
       end
 
       def build_tool_response
+        @grouped_tool_call_results = grouped_tool_call_results
+
+        return process_tool_response if @process_tool_response
+
+        @grouped_tool_call_results
+      end
+
+      def process_tool_response
+        @llm_response = llm_chat(messages: @messages)
+        @raw_response = @llm_response.raw_response
+        message = @raw_response.dig('choices', 0, 'message')
+        add_to_messages([message])
+        parse_json_safely(message['content'])
+      end
+
+      def grouped_tool_call_results
         @tool_call_results.group_by do |hash|
           hash[:name]
         end.transform_values do |arr|
@@ -136,7 +155,7 @@ module Raider
       def process_llm_response(llm_response)
         @llm_response = llm_response
         @raw_response = @llm_response.raw_response
-        add_to_messages(@raw_response.dig('choices', 0, 'message'))
+        add_to_messages([@raw_response.dig('choices', 0, 'message')])
 
         if @current_task.with_tools? && (@tool_calls = @provider.parse_tool_calls(@raw_response).presence)
           process_tool_chain
@@ -154,11 +173,13 @@ module Raider
       def process_tool_call(tool_call)
         tool_method = tool_call.dig('function', 'name')
         tool_args = JSON.parse(tool_call.dig('function', 'arguments'), symbolize_names: true)
+
+        content = call_tool_method(tool_method, tool_args).to_json
         {
           tool_call_id: tool_call.dig('id'),
           role: 'tool',
           name: tool_method ,
-          content: call_tool_method(tool_method, tool_args),
+          content:,
           tool_args:
         }
       end
