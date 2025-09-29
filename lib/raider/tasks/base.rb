@@ -18,16 +18,36 @@ module Raider
         @agent = agent
 
         @task_runner = task_runner
-        @task_context = Utils::TaskContext.new(provider: @provider.provider_ident, llm: @llm.llm_ident)
+        @task_context = Utils::TaskContext.new(default_context)
       end
+
+      def default_context
+        {
+          provider: @provider.provider_ident,
+          llm: @llm.llm_ident,
+          input: nil, # will be overwritten with final prompt from task, currently not processed
+          inputs: {}, # currently not processed
+          output: nil,
+          outputs: {}, # currently not processed
+          tool_calls: [],
+          llm_usages: []
+        }
+      end
+
 
       delegate :set_system_prompt, :chat, :ruby_llm_base_client, :chat_message_with_images, :chat_with_responses, to: :@task_runner
 
       def ident = self.class.name.split('::').last.underscore.to_sym
 
-      def process(prompt)
-        raise NotImplementedError
+
+      def process(input:, inputs: {})
+        @input = input
+        @inputs = inputs.compact_blank
+
+        set_system_prompt(system_prompt)
+        chat(prompt)
       end
+
 
       def with_tools? = tools.present?
 

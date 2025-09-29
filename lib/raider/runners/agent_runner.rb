@@ -16,7 +16,7 @@ module Raider
 
       def process(agent_ident, input:)
         # @current_agent = Raider::Agents.const_get(task.to_s.camelize).new(app:, llm:, provider:, agent_runner: self)
-        @current_agent = Raider::Agents::Base.new(app:, llm:, provider:, agent_runner: self, input:)
+        @current_agent = Raider::Agents::Base.new(app:, llm:, provider:, agent_runner: self, input:, agent_ident:)
         @current_context = @current_agent.agent_context
         @current_agent
       end

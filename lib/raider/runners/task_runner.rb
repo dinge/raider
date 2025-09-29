@@ -16,11 +16,12 @@ module Raider
         @provider = provider
         @agent = agent
 
+        @current_task_ident = nil
         @current_task_class = nil
         @current_task = nil
         @system_prompt = 'You are a helpful agent.'
         @messages = []
-        @llm_usages = []
+        # @llm_usages = []
         @tool_calls = []
         @tool_call_results = []
         @grouped_tool_call_results = {}
@@ -28,6 +29,7 @@ module Raider
       end
 
       def process(task)
+        @current_task_ident = task
         @current_task_class = Raider::Tasks.const_get(task.to_s.camelize)
         if @current_task_class.const_defined?(@llm.llm_ident.to_s.camelize)
           @current_task_class = @current_task_class.const_get(@llm.llm_ident.to_s.camelize)
@@ -42,7 +44,7 @@ module Raider
           llm_args.merge!(tools: @current_task.tools, tool_choice: 'required')
         end
 
-        write_log(llm_args)
+        Raider.debug(task_chat_with_args: @current_task_ident, args: llm_args)
         ruby_llm_client.chat(**llm_args)
       end
 
@@ -101,8 +103,8 @@ module Raider
         chat_response = yield(messages: messages)
 
         @processed_llm_response = process_llm_response(chat_response)
-        @current_context.messages = @messages
-        @current_context.llm_usage = @provider.parse_usage(@raw_response).presence
+        # @current_context.messages = @messages
+        @current_context.llm_usages << @provider.parse_usage(@raw_response).presence
         @current_context.output = build_task_response
       end
 
@@ -165,7 +167,7 @@ module Raider
       end
 
       def process_tool_chain
-        write_log(@raw_response, {})
+        Raider.debug(process_tools_from_task: @current_task_ident, response: @raw_response)
         @tool_call_results = @tool_calls.map(&method(:process_tool_call))
         add_to_messages(@tool_call_results)
       end
@@ -192,7 +194,7 @@ module Raider
         @response_message = @provider.parse_raw_response(@raw_response)
         parse_json_safely(@response_message).tap do |hash_response|
           @parsed_response = hash_response
-          write_log(@raw_response, hash_response)
+          Raider.debug(process_task: @current_task_ident, response: @raw_response)
         end
       end
 
@@ -202,23 +204,6 @@ module Raider
       rescue JSON::ParserError => e
         { error_message: e.message,
           llm_message: str }
-      end
-
-      def write_log(data, hash_response = {})
-        FileUtils.mkdir_p('log/raider')
-
-        entry = {
-          timestamp: Time.now.iso8601,
-          data:,
-          # app_context: @app.app_context,
-          # hash_response:
-        }
-
-        puts JSON.pretty_generate(entry) if @app.app_context[:debug]
-
-        log_file = 'log/raider/raider.log'
-        # log_file = "log/raider/#{@app.app_ident}--#{@current_task.ident}--#{@provider.provider_ident}--#{@llm.llm_ident}.log"
-        File.open(log_file, 'a') { it.puts [entry].to_yaml }
       end
 
       def base64_encode(image) = Base64.strict_encode64(File.binread(image))

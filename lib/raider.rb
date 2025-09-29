@@ -13,10 +13,20 @@ require 'debug'
 
 
 module Raider
-  VERSION = "0.2.4"
+  VERSION = "0.2.5"
 
   class << self
     attr_accessor :logger
+
+    def log(entry)
+      # log/raider/#{@app.app_ident}--#{@current_task.ident}--#{@provider.provider_ident}-
+      self.logger.info(JSON.pretty_generate(entry))
+    end
+
+    def debug(entry)
+      # log/raider/#{@app.app_ident}--#{@current_task.ident}--#{@provider.provider_ident}-
+      self.logger.debug(JSON.pretty_generate(entry))
+    end
 
     def root
       @root ||= Pathname.new(File.expand_path('..', __dir__))
@@ -28,9 +38,10 @@ end
 # Raider.logger.level = Logger::FATAL
 # Langchain.logger.level = Logger::FATAL
 
-Raider.logger = Logger.new($stdout)
-Raider.logger.level = Logger::INFO
-Langchain.logger.level = Logger::DEBUG
+Raider.logger = Logger.new('log/raider/raider.log')
+
+# Raider.logger = Logger.new($stdout)
+Raider.logger.level = Logger::DEBUG
 
 # Langchain.logger = Logger.new('log/langchain.log', **Langchain::LOGGER_OPTIONS)
 Langchain.logger.level = Logger::DEBUG
