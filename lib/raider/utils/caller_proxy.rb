@@ -9,7 +9,7 @@ module Raider
       end
 
       def method_missing(method_name, **args, &proc)
-        @caller.send(@to, method_name, **args, &proc)
+        @caller.send(@to, method_name, **args, &proc).context.to_h
       end
     end
   end

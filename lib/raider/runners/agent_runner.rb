@@ -31,11 +31,16 @@ module Raider
         task_options = args.extract!(:llm, :provider)
         task = @app.create_task(task_ident, llm: task_options[:llm], provider: task_options[:provider], agent: self)
         task.context.as = args.extract!(:as).dig(:as)
-        add_to_output(output: task.ident)
+        add_to_output(output: task.context.as || task.ident)
         call_back_on_task_create!(task)
         process_task!(task, task_ident, **args)
         process_task_response!(task, task_ident)
         task.task_runner
+      end
+
+      def ask(input = nil, **args)
+        args.reverse_merge!(input:)
+        run_task(:ask, **args).context.output.to_h.dig(:response)
       end
 
       protected
@@ -62,6 +67,9 @@ module Raider
         @app.persisted_app ||= create_app_persistence!
       end
 
+      # task processing
+      #################
+
       def process_task!(task, task_ident, **args)
         @app.context.vcr_key ? process_task_with_vcr(task, task_ident, **args) : process_task_without_vcr(task, **args)
       end
@@ -78,7 +86,8 @@ module Raider
         call_back_on_task_reponse!
       end
 
-
+      # callbacks
+      ###########
 
       def call_back_on_task_create!(task)
         return unless @app.context.on_task_create.present?
@@ -92,39 +101,8 @@ module Raider
         @app.send(@app.context.on_task_reponse, task)
       end
 
-      def update_app_persistence!
-        return unless @app.context.with_app_persistence.present?
-
-        @app.persisted_app.update!(
-          output: @app.context.output,
-          outputs: @app.context.outputs,
-          context: @app.context.to_hash
-        )
-#        @app.persisted_app.update!(ended_at: DateTime.now.utc) unless @app.persisted_app.ended_at.present?
-      end
-
-      def process_task_with_vcr(task, task_ident, **args)
-        WebMock.enable!
-        vcr_path = build_vcr_path(task_ident)
-        Raider.log(agent: @agent_ident, vcr_path: vcr_path)
-        VCR.use_cassette(vcr_path, record: :new_episodes) { task.process(**args) }
-        WebMock.disable!
-      end
-
-      def process_task_without_vcr(task, **args)
-        Raider.log(agent: @agent_ident, run_without_vcr_key: true)
-        task.process(**args)
-      end
-
-      def build_vcr_path(task_ident)
-        current_number_of_tasks = @current_agent.agent_context.fetch_number_of_tasks_by_ident(task_ident)
-        [
-          @app.app_ident,
-          @app.context.vcr_key.version_key,
-          @app.context.vcr_key.source_ident,
-          [task_ident, current_number_of_tasks, @llm.llm_ident, @app.context.vcr_key.reprocess_ident].join('--')
-         ].join('/')
-      end
+      # persistence
+      #############
 
       def create_app_persistence!
         return unless @app.context.with_app_persistence.present?
@@ -153,6 +131,43 @@ module Raider
             context: @app.context.to_hash,
             started_at: DateTime.now.utc }.merge(reference)
         )
+      end
+
+      def update_app_persistence!
+        return unless @app.context.with_app_persistence.present?
+
+        @app.persisted_app.update!(
+          output: @app.context.output,
+          outputs: @app.context.outputs,
+          context: @app.context.to_hash,
+          ended_at: DateTime.now.utc
+        )
+      end
+
+      # VCR handling
+      ################
+
+      def process_task_with_vcr(task, task_ident, **args)
+        WebMock.enable!
+        vcr_path = build_vcr_path(task_ident)
+        Raider.log(agent: @agent_ident, vcr_path: vcr_path)
+        VCR.use_cassette(vcr_path, record: :new_episodes) { task.process(**args) }
+        WebMock.disable!
+      end
+
+      def process_task_without_vcr(task, **args)
+        Raider.log(agent: @agent_ident, run_without_vcr_key: true)
+        task.process(**args)
+      end
+
+      def build_vcr_path(task_ident)
+        current_number_of_tasks = @current_agent.agent_context.fetch_number_of_tasks_by_ident(task_ident)
+        [
+          @app.app_ident,
+          @app.context.vcr_key.version_key,
+          @app.context.vcr_key.source_ident,
+          [task_ident, current_number_of_tasks, @llm.llm_ident, @app.context.vcr_key.reprocess_ident].join('--')
+         ].join('/')
       end
     end
   end

@@ -8,7 +8,7 @@ module Raider
 
       alias context agent_context
 
-      delegate :run_task, :tasks, to: :@agent_runner
+      delegate :run_task, :tasks, :ask, to: :@agent_runner
 
       def initialize(agent_ident:, app:, llm:, provider:, agent_runner:, input:)
         @agent_ident = agent_ident
