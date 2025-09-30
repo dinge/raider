@@ -11,13 +11,18 @@ module Raider
 
       alias context task_context
 
+      delegate :set_system_prompt, :chat, :ruby_llm_base_client, :chat_message_with_images, :chat_with_responses, to: :@task_runner
+      delegate :output, :outputs, to: :@task_context
+
+      def ident = self.class.name.split('::').last.underscore.to_sym
+
       def initialize(task_runner:, app:, llm:, provider:, agent: nil)
+        @task_runner = task_runner
         @app = app
         @llm = llm
         @provider = provider
         @agent = agent
 
-        @task_runner = task_runner
         @task_context = Utils::TaskContext.new(default_context)
       end
 
@@ -30,14 +35,11 @@ module Raider
           output: nil,
           outputs: {}, # currently not processed
           tool_calls: [],
-          llm_usages: []
+          llm_usages: [],
+          as: nil
         }
       end
 
-
-      delegate :set_system_prompt, :chat, :ruby_llm_base_client, :chat_message_with_images, :chat_with_responses, to: :@task_runner
-
-      def ident = self.class.name.split('::').last.underscore.to_sym
 
 
       def process(input:, inputs: {})

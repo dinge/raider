@@ -44,7 +44,7 @@ module Raider
           llm_args.merge!(tools: @current_task.tools, tool_choice: 'required')
         end
 
-        Raider.debug(task_chat_with_args: @current_task_ident, args: llm_args)
+        Raider.log(start_task: @current_task_ident, args: llm_args)
         ruby_llm_client.chat(**llm_args)
       end
 
@@ -93,8 +93,8 @@ module Raider
       end
 
       def process_request(prompt, system_prompt:, process_tool_response:)
-        prompt = "```json\n#{JSON.pretty_generate(prompt)}\n```" if prompt.is_a?(Hash)
         @current_context.input = prompt
+        prompt = "```json\n#{JSON.pretty_generate(prompt)}\n```" if prompt.is_a?(Hash)
         @provider.system_prompt = system_prompt || @system_prompt
         @process_tool_response = process_tool_response
 
@@ -167,7 +167,7 @@ module Raider
       end
 
       def process_tool_chain
-        Raider.debug(process_tools_from_task: @current_task_ident, response: @raw_response)
+        Raider.log(process_tools_from_task: @current_task_ident, response: @raw_response)
         @tool_call_results = @tool_calls.map(&method(:process_tool_call))
         add_to_messages(@tool_call_results)
       end
@@ -194,7 +194,7 @@ module Raider
         @response_message = @provider.parse_raw_response(@raw_response)
         parse_json_safely(@response_message).tap do |hash_response|
           @parsed_response = hash_response
-          Raider.debug(process_task: @current_task_ident, response: @raw_response)
+          Raider.log(stop_task: @current_task_ident, response: @raw_response)
         end
       end
 
