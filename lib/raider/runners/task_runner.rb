@@ -7,6 +7,7 @@ module Raider
       attr_reader :agent
       attr_reader :system_prompt, :current_task, :current_context, :messages
       attr_reader :llm_response, :raw_response, :response_message, :parsed_response, :processed_llm_response
+      attr_reader :tool_calls
 
       alias context current_context
 

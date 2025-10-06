@@ -15,6 +15,7 @@ module Raider
       delegate :output, :outputs, to: :@task_context
 
       def ident = self.class.name.split('::').last.underscore.to_sym
+      def alias_or_ident = @task_context.as.presence || ident
 
       def initialize(task_runner:, app:, llm:, provider:, agent: nil)
         @task_runner = task_runner

@@ -20,10 +20,11 @@ module Raider
       def app_ident = app_class_name.underscore
 
       def initialize(input_context = {})
-        @upstream = input_context.extract!(:upstream).presence
+        @upstream = input_context.extract!(:upstream).dig(:upstream)
         @persistence_class = Raider.const_defined?('App') ? Raider::App : nil
         handle_context!(input_context)
         handle_logger!
+        handle_vcr!
       end
 
       def default_context
@@ -46,12 +47,19 @@ module Raider
 
           reprocess: false,
           with_vcr: false,
-          vcr_key: nil,
+          vcr_key: {
+            version_key: 0,
+            source_ident: nil,
+            reprocess_ident: nil
+          },
 
           with_app_persistence: false,
           with_auto_context: false,
           on_task_create: false,
           on_task_response: false,
+
+          tool_calls: [],
+          llm_usages: {}
         }
       end
 
@@ -70,10 +78,12 @@ module Raider
         Raider.log(start_app: app_ident.to_sym)
       end
 
-      # vcr_key.reprocess_ident
-      # vcr_key.version_key
-      # vcr_key.source_ident
-
+      def handle_vcr!
+        @app_context.vcr_key.source_ident ||=
+          @upstream.try(:source_ident) ||
+            @upstream.try(:id) ||
+            Digest::SHA2.hexdigest(input.to_s + inputs.to_s)
+      end
 
       # basic task run without context management
       def create_task(task_ident, llm: nil, provider: nil, agent: nil)

@@ -4,7 +4,7 @@ module Raider
   module Runners
     class AgentRunner
       attr_reader :app, :llm, :provider
-      attr_reader :current_agent
+      attr_reader :current_agent, :current_outputs
 
       def initialize(app:, llm:, provider:)
         @app = app
@@ -13,7 +13,8 @@ module Raider
         @current_agent_class = Raider::Agents::Base
         @current_agent_ident = nil
 
-        @temp_output_messages = []
+        @current_output_items = []
+        @current_outputs_items = []
       end
 
       def process(agent_ident, input:, &proc)
@@ -21,21 +22,31 @@ module Raider
         add_agent_to_app!
         @current_agent.process(&proc) # process tasks in agent block
 
-        add_to_output(last: true)
+        # add_to_output!(finalize: true)
         @current_agent
       end
 
       def tasks = Utils::CallerProxy.new(self, to: :run_task)
+      def response_from = Utils::CallerProxy.new(self, to: :run_response_from)
 
       def run_task(task_ident, **args)
         task_options = args.extract!(:llm, :provider)
+        # basic task run without context management
         task = @app.create_task(task_ident, llm: task_options[:llm], provider: task_options[:provider], agent: self)
         task.context.as = args.extract!(:as).dig(:as)
-        add_to_output(output: task.context.as || task.ident)
+        all_inputs = args.slice(:input, :inputs)
+        task.context.merge!(all_inputs)
+        add_to_output!(output: task.alias_or_ident) #.to_s.titleize
+        # add_to_output!(output: task.alias_or_ident, outputs: all_inputs)
         call_back_on_task_create!(task)
         process_task!(task, task_ident, **args)
         process_task_response!(task, task_ident)
+        call_back_on_task_reponse!(task)
         task.task_runner
+      end
+
+      def run_response_from(response_ident, &proc)
+        run_task(:process_response_from, as: response_ident, inputs: { response_from: proc })
       end
 
       def ask(input = nil, **args)
@@ -43,15 +54,22 @@ module Raider
         run_task(:ask, **args).context.output.to_h.dig(:response)
       end
 
-      protected
-
-      def add_to_output(output: nil, last: false)
+      def add_to_output!(output: nil, outputs: {}, finalize: false, llm_usages: [], tool_calls: [])
         return unless @app.context.with_auto_context.present?
 
-        @temp_output_messages << output if output
-        @app.context.output = last ? @temp_output_messages.last : @temp_output_messages.join("\n")
+        @current_output_items << output unless output.respond_to?(:to_hash)
+        @current_outputs_items << outputs if outputs.compact_blank.presence
+
+        # @app.context.output = finalize ? @current_output_items.last : @current_output_items
+        # @app.context.outputs = finalize ? @current_outputs_items.last : @current_outputs_items
+        @app.context.output = @current_output_items.last #.try(:to_hash)
+        @app.context.outputs = @current_outputs_items.reduce({}, :merge)
+        @app.context.llm_usages.merge!(llm_usages) if llm_usages.present?
+        @app.context.tool_calls.concat(tool_calls) if tool_calls.present?
         update_app_persistence!
       end
+
+      protected
 
       def init_agent(agent_ident:, input:)
         @current_agent_ident = agent_ident
@@ -71,19 +89,20 @@ module Raider
       #################
 
       def process_task!(task, task_ident, **args)
-        @app.context.vcr_key ? process_task_with_vcr(task, task_ident, **args) : process_task_without_vcr(task, **args)
+        return process_task_with_vcr(task, task_ident, **args) if @app.context.vcr_key.present? || @app.context.with_vcr
+
+        process_task_without_vcr(task, **args)
       end
 
       def process_task_response!(task, task_ident)
         @current_agent.agent_context.add_task!(task_ident, task)
         @app.context.add_agent_task!(@current_agent_ident, task_ident, task)
+        task_response = task.output&.response.presence || task.output.to_h
 
-         if @app.context.with_auto_context.present?
-           @app.context.outputs[task.context.as || task_ident] = task.output.response
-         end
-
-        add_to_output(output: task.output.response)
-        call_back_on_task_reponse!
+        add_to_output!(output: task_response,
+                       outputs: { task.alias_or_ident.to_sym => task_response },
+                       llm_usages: { task.alias_or_ident.to_sym => task.context.llm_usages },
+                       tool_calls: task.task_runner.tool_calls)
       end
 
       # callbacks
@@ -95,7 +114,7 @@ module Raider
         @app.send(@app.context.on_task_create, task)
       end
 
-      def call_back_on_task_reponse!
+      def call_back_on_task_reponse!(task)
         return unless @app.context.on_task_reponse.present?
 
         @app.send(@app.context.on_task_reponse, task)
@@ -106,28 +125,26 @@ module Raider
 
       def create_app_persistence!
         return unless @app.context.with_app_persistence.present?
-        # title = "#{self.class.name.split('::').last} | #{upstream.id} - #{DateTime.now.to_fs(:long)} - #{self.class::LLM}"
 
-        reference = case @upstream
+        reference = case @app.upstream
           when Raider::Source
-            { source: upstream, upstream: }
-          when Raider::App
-            { parent_app: upstream, upstream: }
+            { source: @app.upstream, upstream: @app.upstream }
+          when @persistence_class
+            { parent_app: @app.upstream, upstream: @app.upstream }
           else
-            { source: Raider::Source.first, upstream: Raider::Source.first }
+            { source: nil, upstream: @app.upstream }
           end
 
-        title = [@app.app_class_name, DateTime.now.to_fs(:long), @app.context.llm].join(' / ')
+        title = [@app.app_class_name, @app.upstream.try(:id), DateTime.now.to_fs(:long), @app.context.llm].join(' / ')
+
         @app.persistence_class.create!(
           { title:,
             llm: @app.context.llm,
             provider: @app.context.provider,
             processor_class: @app.context.processor_class,
             raider_app_class: @app.app_class_name,
-
             input: @app.context.input,
             inputs: @app.context.inputs,
-
             context: @app.context.to_hash,
             started_at: DateTime.now.utc }.merge(reference)
         )
@@ -162,12 +179,11 @@ module Raider
 
       def build_vcr_path(task_ident)
         current_number_of_tasks = @current_agent.agent_context.fetch_number_of_tasks_by_ident(task_ident)
-        [
-          @app.app_ident,
+        [ @app.app_ident,
           @app.context.vcr_key.version_key,
           @app.context.vcr_key.source_ident,
           [task_ident, current_number_of_tasks, @llm.llm_ident, @app.context.vcr_key.reprocess_ident].join('--')
-         ].join('/')
+        ].join('/')
       end
     end
   end

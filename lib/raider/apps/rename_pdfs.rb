@@ -42,7 +42,7 @@ module Raider
         cleanup(img)
       end
 
-      def perform_tasks
+      def perform_tasks_the_modern_agentic_way
         response = task.vision.basic_info.business_letter(image, app.base.valid_receivers).then do
           task.correctors.value_corrector(it.receiver_name, app.base.valid_receivers)
         end
