@@ -13,7 +13,7 @@ require 'debug'
 
 
 module Raider
-  VERSION = "0.2.6"
+  VERSION = "0.2.7"
 
   class << self
     attr_accessor :logger
@@ -42,13 +42,13 @@ end
 # Langchain.logger.level = Logger::FATAL
 
 if Rails.env.development?
-  Langchain.logger.level = Logger::DEBUG
+  Raider.logger = Logger.new('log/raider/raider.log')
   Raider.logger.level = Logger::DEBUG
-  Logger.new('log/raider/raider.log')
+  Langchain.logger.level = Logger::DEBUG
 else
+  Raider.logger = Logger.new($stdout)
   Raider.logger.level = Logger::INFO
   Langchain.logger.level = Logger::INFO
-  Raider.logger = Logger.new($stdout)
 end
 
 # Langchain.logger = Logger.new('log/langchain.log', **Langchain::LOGGER_OPTIONS)
