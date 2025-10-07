@@ -18,6 +18,22 @@ module Raider
       def merge!(new_hash)
         @table.merge!(new_hash)
       end
+
+      def all_values_present?
+        @table.values.all?(&:present?)
+      end
+
+      def any_value_present?
+        @table.values.all?(&:present?)
+      end
+
+      def def _keys
+        @table.keys
+      end
+
+      def presence
+        @table.select { |_k, v| v.present? }.presence
+      end
     end
   end
 end
