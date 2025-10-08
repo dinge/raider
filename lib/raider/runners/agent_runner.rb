@@ -168,7 +168,7 @@ module Raider
         WebMock.enable!
         vcr_path = build_vcr_path(task_ident)
         Raider.log(agent: @agent_ident, vcr_path: vcr_path)
-        VCR.use_cassette(vcr_path, record: :new_episodes) { task.process(**args) }
+        VCR.use_cassette(vcr_path, record: @app.context.vcr.mode) { task.process(**args) }
         WebMock.disable!
       end
 

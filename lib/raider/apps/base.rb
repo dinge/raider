@@ -45,8 +45,14 @@ module Raider
 
           debug: true,
 
-          reprocess: false,
+          cleanup_inputs: false, # TODO: implement
+
+          reprocess: false, # TODO: use
+
           with_vcr: false,
+          vcr: {
+            mode: :new_episodes
+          },
           vcr_key: {
             version_key: 0,
             source_ident: nil,
@@ -61,28 +67,6 @@ module Raider
           tool_calls: [],
           llm_usages: {}
         }
-      end
-
-      def handle_context!(input_context)
-        context_hash = input_context.reverse_merge(default_context)
-                                     .merge!(upstream_global_id: @upstream&.to_global_id.to_s.presence)
-        @app_context = Utils::AppContext.new(context_hash)
-
-        if @app_context.with_app_persistence.present? && @persistence_class.blank?
-          raise StandardError, 'no app persistance class defined'
-        end
-      end
-
-      def handle_logger!
-        Raider.logger.level = Logger::DEBUG if @app_context.debug || ENV['DEBUG'] == 'true'
-        Raider.log(start_app: app_ident.to_sym)
-      end
-
-      def handle_vcr!
-        @app_context.vcr_key.source_ident ||=
-          @upstream.try(:source_ident) ||
-            @upstream.try(:id) ||
-            Digest::SHA2.hexdigest(input.to_s + inputs.to_s)
       end
 
       # basic task run without context management
@@ -110,6 +94,27 @@ module Raider
       end
 
       ## TODO: move to AppRunner
+      def handle_context!(input_context)
+        context_hash = input_context.reverse_merge(default_context)
+                                    .merge!(upstream_global_id: @upstream&.to_global_id.to_s.presence)
+        @app_context = Utils::AppContext.new(context_hash)
+
+        if @app_context.with_app_persistence.present? && @persistence_class.blank?
+          raise StandardError, 'no app persistance class defined'
+        end
+      end
+
+      def handle_logger!
+        Raider.logger.level = Logger::DEBUG if @app_context.debug ||= ENV['DEBUG'] == 'true'
+        Raider.log(start_app: app_ident.to_sym)
+      end
+
+      def handle_vcr!
+        @app_context.vcr_key.source_ident ||=
+          @upstream.try(:source_ident) ||
+            @upstream.try(:id) ||
+            Digest::SHA2.hexdigest(input.to_s + inputs.to_s)
+      end
 
       def init_llm_setup!(provider, llm)
         init_provider(provider)
