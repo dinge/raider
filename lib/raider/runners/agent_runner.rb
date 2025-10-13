@@ -22,11 +22,12 @@ module Raider
         add_agent_to_app!
         @current_agent.process(&proc) # process tasks in agent block
 
-        # add_to_output!(finalize: true)
+        add_to_output!(finalize: true)
         @current_agent
       end
 
       def tasks = Utils::CallerProxy.new(self, to: :run_task)
+      def ptasks = Utils::CallerProxy.new(self, to: :run_ptask)
       def response_from = Utils::CallerProxy.new(self, to: :run_response_from)
 
       def run_task(task_ident, **args)
@@ -39,11 +40,31 @@ module Raider
         add_to_output!(output: task.alias_or_ident) #.to_s.titleize
         # add_to_output!(output: task.alias_or_ident, outputs: all_inputs)
         call_back_on_task_create!(task)
+
         process_task!(task, task_ident, **args)
+
         process_task_response!(task, task_ident)
         call_back_on_task_reponse!(task)
         task.task_runner
       end
+
+      # def run_ptask(task_ident, **args)
+      #   task_options = args.extract!(:llm, :provider)
+      #   # basic task run without context management
+      #   task = @app.create_task(task_ident, llm: task_options[:llm], provider: task_options[:provider], agent: self)
+      #   task.context.as = args.extract!(:as).dig(:as)
+      #   all_inputs = args.slice(:input, :inputs)
+      #   task.context.merge!(all_inputs)
+      #   add_to_output!(output: task.alias_or_ident) #.to_s.titleize
+      #   # add_to_output!(output: task.alias_or_ident, outputs: all_inputs)
+      #   call_back_on_task_create!(task)
+
+      #   process_task!(task, task_ident, **args)
+
+      #   process_task_response!(task, task_ident)
+      #   call_back_on_task_reponse!(task)
+      #   task.task_runner
+      # end
 
       def run_response_from(response_ident, &proc)
         run_task(:process_response_from, as: response_ident, inputs: { response_from: proc })
@@ -57,14 +78,14 @@ module Raider
       def add_to_output!(output: nil, outputs: {}, finalize: false, llm_usages: [], tool_calls: [])
         return unless @app.context.with_auto_context.present?
 
-        @current_output_items << output unless output.respond_to?(:to_hash)
+        @current_output_items << output if !output.respond_to?(:to_hash) && output.present?
         @current_outputs_items << outputs if outputs.compact_blank.presence
 
-        # @app.context.output = finalize ? @current_output_items.last : @current_output_items
+        # @app.context.output = finalize ? @current_output_items.last : @current_output_items.join(' + ')
         # @app.context.outputs = finalize ? @current_outputs_items.last : @current_outputs_items
-        @app.context.output = @current_output_items.last #.try(:to_hash)
+        @app.context.output = @current_output_items.last
         @app.context.outputs = @current_outputs_items.reduce({}, :merge)
-        @app.context.llm_usages.merge!(llm_usages) if llm_usages.present?
+        @app.context.llm_usages << llm_usages if llm_usages.present?
         @app.context.tool_calls.concat(tool_calls) if tool_calls.present?
         update_app_persistence!
       end

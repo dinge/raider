@@ -65,7 +65,7 @@ module Raider
           on_task_response: false,
 
           tool_calls: [],
-          llm_usages: {}
+          llm_usages: []
         }
       end
 

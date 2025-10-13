@@ -13,7 +13,7 @@ require 'debug'
 
 
 module Raider
-  VERSION = "0.2.8"
+  VERSION = "0.2.9"
 
   class << self
     attr_accessor :logger
@@ -29,6 +29,11 @@ module Raider
       # log/raider/#{@app.app_ident}--#{@current_task.ident}--#{@provider.provider_ident}-
       self.logger.debug("#{'-' * 10} #{[entry.first].to_h} #{'-' * 70} ")
       self.logger.debug(JSON.pretty_generate(entry))
+    end
+
+    def run_task(task_ident, **args)
+      app_options = (args.extract!(:app_options) || {}).fetch(:app_options, {})
+      Raider::Apps::Base.new(app_options).create_task(task_ident.to_s.underscore.to_sym).process(**args)
     end
 
     def root
