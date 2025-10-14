@@ -26,7 +26,7 @@ module Raider
         @tool_calls = []
         @tool_call_results = []
         @grouped_tool_call_results = {}
-        @process_tool_response = false
+        @process_tool_response = false # :only_with_results
       end
 
       def process(task)
@@ -133,18 +133,23 @@ module Raider
 
       def build_tool_response
         @grouped_tool_call_results = grouped_tool_call_results
+        is_empty_tool_response = @grouped_tool_call_results.values.flatten.uniq == ["[]"]
 
-        return process_tool_response if @process_tool_response
+        return @grouped_tool_call_results if is_empty_tool_response && @process_tool_response == :only_with_results
 
-        @grouped_tool_call_results
+        process_tool_response_with_second_chat
       end
 
-      def process_tool_response
+      def process_tool_response_with_second_chat
+        @app.send(@app.context.on_tool_process, @current_task, @grouped_tool_call_results.keys) if @app.context.on_tool_process.present?
+
         @llm_response = llm_chat(messages: @messages)
         @raw_response = @llm_response.raw_response
         message = @raw_response.dig('choices', 0, 'message')
         add_to_messages([message])
-        parse_json_safely(message['content'])
+        parse_json_safely(message['content']).tap do
+          @app.send(@app.context.on_tool_process_response, @current_task, :tool_method, it) if @app.context.on_tool_process_response.present?
+        end
       end
 
       def grouped_tool_call_results
@@ -188,7 +193,10 @@ module Raider
       end
 
       def call_tool_method(tool_method, tool_args)
-        @current_task.send("#{tool_method}_tool", **tool_args)
+        @app.send(@app.context.on_tool_call, @current_task, tool_method, tool_args) if @app.context.on_tool_call.present?
+        @current_task.send("#{tool_method}_tool", **tool_args).tap do
+          @app.send(@app.context.on_tool_response, @current_task, tool_method, it) if @app.context.on_tool_response.present?
+        end
       end
 
       def process_regular_response

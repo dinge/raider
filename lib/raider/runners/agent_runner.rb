@@ -41,9 +41,14 @@ module Raider
         # add_to_output!(output: task.alias_or_ident, outputs: all_inputs)
         call_back_on_task_create!(task)
 
-        process_task!(task, task_ident, **args)
+        begin
+          process_task!(task, task_ident, **args)
+          process_task_response!(task, task_ident)
+        rescue => error
+          raise error if @app.context.reraise_exception.present?
+          process_task_response!(task, task_ident, error:)
+        end
 
-        process_task_response!(task, task_ident)
         call_back_on_task_reponse!(task)
         task.task_runner
       end
@@ -78,7 +83,8 @@ module Raider
       def add_to_output!(output: nil, outputs: {}, finalize: false, llm_usages: [], tool_calls: [])
         return unless @app.context.with_auto_context.present?
 
-        @current_output_items << output if !output.respond_to?(:to_hash) && output.present?
+        # @current_output_items << output.try(:to_markdown) || output if output.present?
+        @current_output_items << output if output.present?
         @current_outputs_items << outputs if outputs.compact_blank.presence
 
         # @app.context.output = finalize ? @current_output_items.last : @current_output_items.join(' + ')
@@ -115,13 +121,26 @@ module Raider
         process_task_without_vcr(task, **args)
       end
 
-      def process_task_response!(task, task_ident)
-        @current_agent.agent_context.add_task!(task_ident, task)
-        @app.context.add_agent_task!(@current_agent_ident, task_ident, task)
-        task_response = task.output&.response.presence || task.output.to_h
+      def process_task_response!(task, task_ident, error: nil)
+        if error
+          task_response_output = error.message
+          task_response_outputs =
+            { error: {
+                task_ident:,
+                exception: error,
+                message: error.message
+            } }
+        else
+          @current_agent.agent_context.add_task!(task_ident, task)
+          @app.context.add_agent_task!(@current_agent_ident, task_ident, task)
+          task_response_output = task.output&.response.presence || task.output.to_h
+          task_response_outputs = task_response_output
+        end
 
-        add_to_output!(output: task_response,
-                       outputs: { task.alias_or_ident.to_sym => task_response },
+#        debugger
+
+        add_to_output!(output: task_response_output,
+                       outputs: { task.alias_or_ident.to_sym => task_response_outputs },
                        llm_usages: { task.alias_or_ident.to_sym => task.context.llm_usages },
                        tool_calls: task.task_runner.tool_calls)
       end

@@ -59,9 +59,14 @@ module Raider
             reprocess_ident: nil
           },
 
+          reraise_exception: true,
           with_app_persistence: false,
           with_auto_context: false,
           on_task_create: false,
+          on_tool_call: false,
+          on_tool_response: false,
+          on_tool_process: false,
+          on_tool_process_response: false,
           on_task_response: false,
 
           tool_calls: [],
