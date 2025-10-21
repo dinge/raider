@@ -11,20 +11,21 @@ module Raider
 
       SANITIZER = Rails::HTML5::SafeListSanitizer.new
 
-      def initialize(input)
+      def initialize(input, tags: [])
         @input = input
+        @tags = tags
       end
 
       def process
-        sanitize_text(@input)
+        sanitize_text(@input, @tags)
           .then { filter_allowed_characters(it) }
           .then { clean_whitespace(it) }
       end
 
       private
 
-      def sanitize_text(input)
-        SANITIZER.sanitize(input, tags: []) || ''
+      def sanitize_text(input, tags)
+        SANITIZER.sanitize(input, tags:) || ''
       end
 
       def filter_allowed_characters(input)

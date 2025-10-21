@@ -26,3 +26,6 @@ group :development, :test do
   gem 'rubocop-rails'
   gem 'simplecov'
 end
+
+# gem "deep_merge"
+# https://github.com/danielsdeleo/deep_merge
