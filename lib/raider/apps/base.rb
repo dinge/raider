@@ -20,11 +20,13 @@ module Raider
       def app_ident = app_class_name.underscore
 
       def initialize(input_context = {})
+        Raider.log(start_app: app_ident, input_context: input_context.to_hash)
         @upstream = input_context.extract!(:upstream).dig(:upstream)
         @persistence_class = Raider.const_defined?('App') ? Raider::App : nil
         handle_context!(input_context)
         handle_logger!
         handle_vcr!
+        Raider.log(start_app: app_ident, context: context.to_hash)
       end
 
       def default_context
@@ -111,7 +113,6 @@ module Raider
 
       def handle_logger!
         Raider.logger.level = Logger::DEBUG if @app_context.debug ||= ENV['DEBUG'] == 'true'
-        Raider.log(start_app: app_ident.to_sym)
       end
 
       def handle_vcr!
