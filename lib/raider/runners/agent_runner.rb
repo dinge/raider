@@ -51,7 +51,6 @@ module Raider
       def process_task_and_response!(task, task_ident, **args)
         current_retries = 0
         begin
-          raise "urgs"
           process_task!(task, task_ident, **args)
           process_task_response!(task, task_ident)
         rescue => error
