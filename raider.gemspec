@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name = 'raider'
-  spec.version = '0.2.13'
+  spec.version = '0.2.15'
   spec.authors = ['Lars Gollnow']
   spec.email = ['lg@megorei.com']
 
@@ -35,6 +35,7 @@ Gem::Specification.new do |spec|
   # spec.add_dependency "example-gem", "~> 1.0"
   spec.add_dependency 'activesupport'
   spec.add_dependency 'base64'
+  spec.add_dependency 'commonmarker'
   spec.add_dependency 'debug'
   spec.add_dependency 'faraday'
   spec.add_dependency 'json'

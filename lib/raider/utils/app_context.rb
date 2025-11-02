@@ -11,11 +11,11 @@ module Raider
         fetch_agent(agent_ident)
       end
 
-      def add_agent_task!(agent_ident, task_ident, task)
-        return if agent_task_exists?(agent_ident, task_ident)
+      def add_agent_task!(agent_ident, task)
+        return if agent_task_exists?(agent_ident, task)
 
         fetch_agent(agent_ident).tap do
-          it.tasks << { task_ident.to_sym => task.context.to_hash }
+          it.tasks << { task.alias_or_ident => task.context.to_hash }
         end
       end
 
@@ -28,8 +28,8 @@ module Raider
         fetch_agent(agent_ident.to_sym)&.fetch_task(task_ident)
       end
 
-      def agent_task_exists?(agent_ident, task_ident)
-        fetch_agent(agent_ident.to_sym)&.fetch_task(task_ident).present?
+      def agent_task_exists?(agent_ident, task)
+        fetch_agent(agent_ident.to_sym)&.fetch_task(task.alias_or_ident).present?
       end
 
       def dump_tasks

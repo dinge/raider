@@ -15,6 +15,7 @@ module Raider
 
         @current_output_items = []
         @current_outputs_items = []
+        @current_errors = []
       end
 
       def process(agent_ident, input:, &proc)
@@ -41,35 +42,35 @@ module Raider
         # add_to_output!(output: task.alias_or_ident, outputs: all_inputs)
         call_back_on_task_create!(task)
 
-        begin
-          process_task!(task, task_ident, **args)
-          process_task_response!(task, task_ident)
-        rescue => error
-          raise error if @app.context.reraise_exception.present?
-          process_task_response!(task, task_ident, error:)
-        end
+        process_task_and_response!(task, task_ident, **args)
 
-        call_back_on_task_reponse!(task)
+        call_back_on_task_response!(task)
         task.task_runner
       end
 
-      # def run_ptask(task_ident, **args)
-      #   task_options = args.extract!(:llm, :provider)
-      #   # basic task run without context management
-      #   task = @app.create_task(task_ident, llm: task_options[:llm], provider: task_options[:provider], agent: self)
-      #   task.context.as = args.extract!(:as).dig(:as)
-      #   all_inputs = args.slice(:input, :inputs)
-      #   task.context.merge!(all_inputs)
-      #   add_to_output!(output: task.alias_or_ident) #.to_s.titleize
-      #   # add_to_output!(output: task.alias_or_ident, outputs: all_inputs)
-      #   call_back_on_task_create!(task)
-
-      #   process_task!(task, task_ident, **args)
-
-      #   process_task_response!(task, task_ident)
-      #   call_back_on_task_reponse!(task)
-      #   task.task_runner
-      # end
+      def process_task_and_response!(task, task_ident, **args)
+        current_retries = 0
+        begin
+          raise "urgs"
+          process_task!(task, task_ident, **args)
+          process_task_response!(task, task_ident)
+        rescue => error
+          error_message = error.to_s.presence || error.class.name
+          add_to_output!(error: { task_ident => error_message })
+          if @app.context.retries_on_exception.presence.to_i > 0 && current_retries <= app.context.retries_on_exception
+            current_retries += 1
+            Raider.log(agent: @agent_ident, task: task_ident, retry_on_exception: current_retries, error: error_message)
+            sleep(1)
+            retry
+          else
+            if @app.context.reraise_exception.present?
+              @app.persisted_app&.destroy if @app.context.destroy_app_persistence_on_exception.present?
+              raise error.class, error.message
+            end
+            process_task_response!(task, task_ident, error:)
+          end
+        end
+      end
 
       def run_response_from(response_ident, &proc)
         run_task(:process_response_from, as: response_ident, inputs: { response_from: proc })
@@ -80,19 +81,24 @@ module Raider
         run_task(:ask, **args).context.output.to_h.dig(:response)
       end
 
-      def add_to_output!(output: nil, outputs: {}, finalize: false, llm_usages: [], tool_calls: [])
+      def add_to_output!(output: nil, outputs: {}, finalize: false, llm_usages: [], tool_calls: [], error: nil)
         return unless @app.context.with_auto_context.present?
 
         # @current_output_items << output.try(:to_markdown) || output if output.present?
         @current_output_items << output if output.present?
         @current_outputs_items << outputs if outputs.compact_blank.presence
+        @current_errors << error if error.present?
 
         # @app.context.output = finalize ? @current_output_items.last : @current_output_items.join(' + ')
         # @app.context.outputs = finalize ? @current_outputs_items.last : @current_outputs_items
-        @app.context.output = @current_output_items.last
-        @app.context.outputs = @current_outputs_items.reduce({}, :merge)
         @app.context.llm_usages << llm_usages if llm_usages.present?
         @app.context.tool_calls.concat(tool_calls) if tool_calls.present?
+
+        @app.context.output = @current_output_items.last
+        @app.context.outputs = @current_outputs_items.reduce({}, :merge)
+                                 .merge({ llm_usages: @app.context.llm_usages,
+                                          tool_calls: @app.context.tool_calls,
+                                          errors: @current_errors.presence }.compact_blank)
         update_app_persistence!
       end
 
@@ -131,17 +137,15 @@ module Raider
                 message: error.message
             } }
         else
-          @current_agent.agent_context.add_task!(task_ident, task)
-          @app.context.add_agent_task!(@current_agent_ident, task_ident, task)
+          @current_agent.agent_context.add_task!(task)
+          @app.context.add_agent_task!(@current_agent_ident, task)
           task_response_output = task.output&.response.presence || task.output.to_h
           task_response_outputs = task_response_output
         end
 
-#        debugger
-
-        add_to_output!(output: task_response_output,
-                       outputs: { task.alias_or_ident.to_sym => task_response_outputs },
-                       llm_usages: { task.alias_or_ident.to_sym => task.context.llm_usages },
+         add_to_output!(output: task_response_output,
+                       outputs: { task.alias_or_ident => task_response_outputs },
+                       llm_usages: { task.alias_or_ident => task.context.llm_usages },
                        tool_calls: task.task_runner.tool_calls)
       end
 
@@ -154,10 +158,10 @@ module Raider
         @app.send(@app.context.on_task_create, task)
       end
 
-      def call_back_on_task_reponse!(task)
-        return unless @app.context.on_task_reponse.present?
+      def call_back_on_task_response!(task)
+        return unless @app.context.on_task_response.present?
 
-        @app.send(@app.context.on_task_reponse, task)
+        @app.send(@app.context.on_task_response, task)
       end
 
       # persistence
@@ -193,7 +197,7 @@ module Raider
       def update_app_persistence!
         return unless @app.context.with_app_persistence.present?
 
-        @app.persisted_app.update!(
+        @app.persisted_app.reload.update!(
           output: @app.context.output,
           outputs: @app.context.outputs,
           context: @app.context.to_hash,
@@ -207,7 +211,7 @@ module Raider
       def process_task_with_vcr(task, task_ident, **args)
         WebMock.enable!
         vcr_path = build_vcr_path(task_ident)
-        Raider.log(agent: @agent_ident, vcr_path: vcr_path)
+        Raider.log(agent: @agent_ident, vcr_path:)
         VCR.use_cassette(vcr_path, record: @app.context.vcr.mode) { task.process(**args) }
         WebMock.disable!
       end

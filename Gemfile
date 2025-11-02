@@ -4,6 +4,7 @@ source 'https://rubygems.org'
 
 gem 'activesupport'
 gem 'base64'
+gem 'commonmarker'
 gem 'debug'
 gem 'faraday'
 gem 'json'

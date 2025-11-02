@@ -11,6 +11,8 @@ module Raider
 
       alias to_s inspect
 
+      def to_context = self
+
       # def each(&block)
       #   block.call(@table)
       # end
@@ -27,7 +29,7 @@ module Raider
         @table.values.all?(&:present?)
       end
 
-      def def _keys
+      def keys
         @table.keys
       end
 

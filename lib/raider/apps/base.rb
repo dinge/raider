@@ -62,6 +62,8 @@ module Raider
           },
 
           reraise_exception: true,
+          retries_on_exception: 0,
+          destroy_app_persistence_on_exception: false,
           with_app_persistence: false,
           with_auto_context: false,
           on_task_create: false,
@@ -103,6 +105,7 @@ module Raider
       ## TODO: move to AppRunner
       def handle_context!(input_context)
         context_hash = input_context.reverse_merge(default_context)
+                                    # .reverse_merge(processor_class: @upstream.try(&:processor_class).presence)
                                     .merge!(upstream_global_id: @upstream&.to_global_id.to_s.presence)
         @app_context = Utils::AppContext.new(context_hash)
 

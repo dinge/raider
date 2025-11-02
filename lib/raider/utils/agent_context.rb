@@ -3,10 +3,8 @@
 module Raider
   module Utils
     class AgentContext < BaseContext
-      def add_task!(task_ident, task)
-        { task_ident.to_sym => task.context.to_hash }.tap do
-          tasks << it
-        end
+      def add_task!(task)
+        { task.alias_or_ident => task.context.to_hash }.tap { tasks << it }
       end
 
       def fetch_task(task_ident)
