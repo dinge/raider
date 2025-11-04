@@ -98,7 +98,7 @@ module Raider
                                  .merge({ llm_usages: @app.context.llm_usages,
                                           tool_calls: @app.context.tool_calls,
                                           errors: @current_errors.presence }.compact_blank)
-        update_app_persistence!
+        update_app_persistence!(finalize:)
       end
 
       protected
@@ -193,14 +193,15 @@ module Raider
         )
       end
 
-      def update_app_persistence!
+      def update_app_persistence!(finalize: false)
         return unless @app.context.with_app_persistence.present?
 
         @app.persisted_app.reload.update!(
           output: @app.context.output,
           outputs: @app.context.outputs,
           context: @app.context.to_hash,
-          ended_at: DateTime.now.utc
+          ended_at: DateTime.now.utc,
+          finalized_at: finalize ? DateTime.now.utc : nil
         )
       end
 
