@@ -20,9 +20,9 @@ module Raider
         fetch_tasks_by_ident(task_ident).count
       end
 
-      def task_response_from(task_ident)
-        fetch_task(task_ident).response
-      end
+      # def task_response_from(task_ident)
+      #   fetch_task(task_ident).response
+      # end
     end
   end
 end

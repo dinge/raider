@@ -121,7 +121,7 @@ module Raider
       #################
 
       def process_task!(task, task_ident, **args)
-        return process_task_with_vcr(task, task_ident, **args) if @app.context.vcr_key.present? || @app.context.with_vcr
+        return process_task_with_vcr(task, **args) if @app.context.vcr_key.present? || @app.context.with_vcr
 
         process_task_without_vcr(task, **args)
       end
@@ -208,9 +208,9 @@ module Raider
       # VCR handling
       ################
 
-      def process_task_with_vcr(task, task_ident, **args)
+      def process_task_with_vcr(task, **args)
         WebMock.enable!
-        vcr_path = build_vcr_path(task_ident)
+        vcr_path = build_vcr_path(task)
         Raider.log(agent: @agent_ident, vcr_path:)
         VCR.use_cassette(vcr_path, record: @app.context.vcr.mode) { task.process(**args) }
         WebMock.disable!
@@ -221,12 +221,12 @@ module Raider
         task.process(**args)
       end
 
-      def build_vcr_path(task_ident)
-        current_number_of_tasks = @current_agent.agent_context.fetch_number_of_tasks_by_ident(task_ident)
+      def build_vcr_path(task)
+        current_number_of_tasks = @current_agent.agent_context.fetch_number_of_tasks_by_ident(task.alias_or_ident)
         [ @app.app_ident,
           @app.context.vcr_key.version_key,
           @app.context.vcr_key.source_ident,
-          [task_ident, current_number_of_tasks, @llm.llm_ident, @app.context.vcr_key.reprocess_ident].join('--')
+          [task.alias_or_ident, current_number_of_tasks, @llm.llm_ident, @app.context.vcr_key.reprocess_ident].join('--')
         ].join('/')
       end
     end
