@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name = 'raider'
-  spec.version = '0.2.18'
+  spec.version = '0.2.19'
   spec.authors = ['Lars Gollnow']
   spec.email = ['lg@megorei.com']
 
