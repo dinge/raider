@@ -121,7 +121,7 @@ module Raider
       #################
 
       def process_task!(task, task_ident, **args)
-        return process_task_with_vcr(task, **args) if @app.context.vcr_key.present? || @app.context.with_vcr
+        return process_task_with_vcr(task, **args) if @app.context.with_vcr
 
         process_task_without_vcr(task, **args)
       end
