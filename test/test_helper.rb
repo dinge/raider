@@ -5,6 +5,8 @@ require 'minitest/reporters'
 require 'mocha/minitest'
 require 'simplecov'
 require 'fileutils'
+require 'vcr'
+require 'webmock/minitest'
 
 # Start SimpleCov
 SimpleCov.start
@@ -15,6 +17,17 @@ Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(color: true)]
 # Add lib to load path and load our app
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'raider'
+
+# Configure VCR
+VCR.configure do |config|
+  config.cassette_library_dir = 'test/vcr_cassettes'
+  config.hook_into :webmock
+  config.default_cassette_options = {
+    record: :new_episodes,
+    match_requests_on: [:method, :uri, :body]
+  }
+  config.allow_http_connections_when_no_cassette = false
+end
 
 # Mock responses
 MOCK_LLM_RESPONSE = {

@@ -26,6 +26,8 @@ group :development, :test do
   gem 'rubocop'
   gem 'rubocop-rails'
   gem 'simplecov'
+  gem 'vcr'
+  gem 'webmock'
 end
 
 # gem "deep_merge"

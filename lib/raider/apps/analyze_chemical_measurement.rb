@@ -3,10 +3,10 @@
 module Raider
   module Apps
     class AnalyzeChemicalMeasurement < Base
-      def self.analyze(input:, inputs: {})
+      def self.analyze(input:, inputs: {}, with_app_persistence: false, with_auto_context: false)
         new(
-          with_app_persistence: true,
-          with_auto_context: true,
+          with_app_persistence:,
+          with_auto_context:,
           with_vcr: true,
           input:,
           inputs:,

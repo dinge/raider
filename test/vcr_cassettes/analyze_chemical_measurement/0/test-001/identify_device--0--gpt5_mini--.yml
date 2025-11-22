@@ -1,0 +1,25 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.openai.com/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gpt-4o-mini","messages":[{"role":"system","content":"You are a chemical measurement device identification expert..."},{"role":"user","content":"Identify this chemical measurement device..."}],"temperature":0.7}'
+    headers:
+      Authorization:
+      - Bearer test_api_key
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+    body:
+      encoding: UTF-8
+      string: '{"id":"chatcmpl-test456","object":"chat.completion","created":1706198401,"model":"gpt-4o-mini","choices":[{"index":0,"message":{"role":"assistant","content":"```json\n{\n  \"device_name\": \"Mettler Toledo SevenCompact S220 pH Meter\",\n  \"manufacturer\": \"Mettler Toledo\",\n  \"model\": \"S220\",\n  \"series\": \"SevenCompact\",\n  \"device_type\": \"Benchtop pH meter\",\n  \"measurement_types\": [\"pH\", \"Temperature\", \"mV\"],\n  \"key_features\": [\n    \"Auto-calibration with up to 3 points\",\n    \"Automatic temperature compensation (ATC)\",\n    \"Data logging capability\",\n    \"USB connectivity\",\n    \"Large LCD display\"\n  ],\n  \"typical_range\": {\n    \"pH\": \"0.00 - 14.00\",\n    \"temperature\": \"-5 to 105 °C\",\n    \"mV\": \"±2000 mV\"\n  },\n  \"typical_accuracy\": {\n    \"pH\": \"±0.01 pH\",\n    \"temperature\": \"±0.1 °C\",\n    \"mV\": \"±1 mV\"\n  },\n  \"confidence_level\": \"high\",\n  \"identification_basis\": \"Device branding visible showing 'Mettler Toledo', display layout matches SevenCompact series, measurement values and format consistent with S220 model\",\n  \"alternative_models\": []\n}\n```"},"finish_reason":"stop"}],"usage":{"prompt_tokens":120,"completion_tokens":250,"total_tokens":370}}'
+  recorded_at: Thu, 25 Jan 2025 14:30:01 GMT
+recorded_with: VCR 6.2.0
