@@ -3,3 +3,4 @@ input/
 output/
 coverage/
 log/
+test/fixtures/

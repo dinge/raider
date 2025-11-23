@@ -45,7 +45,7 @@ end
 # Raider.logger.level = Logger::FATAL
 # Langchain.logger.level = Logger::FATAL
 
-if Rails.env.development?
+if defined?(Rails) && Rails.env.development?
   Raider.logger = Logger.new('log/raider/raider.log')
   Raider.logger.level = Logger::DEBUG
   Langchain.logger.level = Logger::DEBUG

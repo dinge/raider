@@ -1,0 +1,25 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.openai.com/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gpt-4o-mini","messages":[{"role":"system","content":"You are a specialized chemical measurement device analysis expert..."},{"role":"user","content":[{"type":"text","text":"Analyze this chemical measurement device image..."},{"type":"image_url","image_url":{"url":"data:image/jpeg;base64,..."}}]}],"temperature":0.7}'
+    headers:
+      Authorization:
+      - Bearer test_api_key
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+    body:
+      encoding: UTF-8
+      string: '{"id":"chatcmpl-test123","object":"chat.completion","created":1706198400,"model":"gpt-4o-mini","choices":[{"index":0,"message":{"role":"assistant","content":"```json\n{\n  \"ocr_text\": \"Mettler Toledo\\npH: 7.42\\nTemp: 25.3°C\\nCAL: 2025-01-10\\nREADY\\nSample ID: LAB-2025-001\",\n  \"measurements\": [\n    {\n      \"parameter\": \"pH\",\n      \"value\": 7.42,\n      \"unit\": \"pH\",\n      \"quality\": \"good\",\n      \"timestamp\": \"2025-01-15 14:30:00\"\n    },\n    {\n      \"parameter\": \"Temperature\",\n      \"value\": 25.3,\n      \"unit\": \"°C\",\n      \"quality\": \"good\",\n      \"timestamp\": \"2025-01-15 14:30:00\"\n    }\n  ],\n  \"device_text\": \"Mettler Toledo\",\n  \"sample_id\": \"LAB-2025-001\",\n  \"batch_number\": null,\n  \"status_indicators\": [\"READY\", \"CALIBRATED\"],\n  \"warnings\": [],\n  \"calibration_date\": \"2025-01-10\",\n  \"additional_info\": \"Device shows stable readings with good signal quality\"\n}\n```"},"finish_reason":"stop"}],"usage":{"prompt_tokens":150,"completion_tokens":200,"total_tokens":350}}'
+  recorded_at: Thu, 25 Jan 2025 14:30:00 GMT
+recorded_with: VCR 6.2.0
